@@ -54,6 +54,23 @@
   padding: 8px 12px;
   border: 1px solid #ddd7cc;
   border-radius: 8px;
+  background: white;
+  color: #2b1b13;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.roster-right select:hover {
+  border-color: #957418;
+  background-color: #fefcf9;
+}
+
+.roster-right select:focus {
+  outline: none;
+  border-color: #957418;
+  box-shadow: 0 0 0 2px rgba(149, 116, 24, 0.1);
 }
 .buyers-table-wrapper {
   width: 100%;
@@ -84,6 +101,7 @@
   padding: 12px 14px;
   border-top: 1px solid #eee;
   vertical-align: middle;
+  text-align: left;
 }
 
 .buyer-cell {

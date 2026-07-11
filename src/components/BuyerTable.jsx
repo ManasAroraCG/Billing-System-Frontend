@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   FiEye,
   FiEdit2,
@@ -10,6 +11,31 @@ export default function BuyerTable({
   onEdit,
   onInsights,
 }) {
+  const [statusFilter, setStatusFilter] = useState("All Buyers");
+
+  const formatGST = (gst) => {
+    if (!gst) return gst;
+    const cleaned = gst.replace(/\s+/g, '');
+    if (cleaned.length === 15) {
+      return `${cleaned.slice(0, 2)} ${cleaned.slice(2, 12)} ${cleaned.slice(12)}`;
+    }
+    return gst;
+  };
+
+  const getFilteredBuyers = () => {
+    if (statusFilter === "All Buyers") {
+      return buyers;
+    }
+    if (statusFilter === "Settled") {
+      return buyers.filter((b) => b.pending === "₹0");
+    }
+    if (statusFilter === "Pending" || statusFilter === "Overdue") {
+      return buyers.filter((b) => b.pending !== "₹0");
+    }
+    return buyers;
+  };
+
+  const filteredBuyers = getFilteredBuyers();
   return (
     <div className="roster-card">
       <div className="roster-header">
@@ -30,7 +56,7 @@ export default function BuyerTable({
         <div className="roster-right">
           <span>Filter by Status:</span>
 
-          <select>
+          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
             <option>All Buyers</option>
             <option>Settled</option>
             <option>Pending</option>
@@ -54,7 +80,7 @@ export default function BuyerTable({
           </thead>
 
           <tbody>
-            {buyers.map((buyer) => (
+            {filteredBuyers.map((buyer) => (
               <tr key={buyer.id}>
                 <td>
                   <div className="buyer-cell">
@@ -74,7 +100,7 @@ export default function BuyerTable({
                   </div>
                 </td>
 
-                <td>{buyer.gst}</td>
+                <td>{formatGST(buyer.gst)}</td>
 
                 <td>
                   <div className="contact-block">
@@ -147,7 +173,7 @@ export default function BuyerTable({
 
       <div className="table-footer">
         <span>
-          Showing 1 to {buyers.length} of{" "}
+          Showing 1 to {filteredBuyers.length} of{" "}
           {buyers.length} buyers
         </span>
 
