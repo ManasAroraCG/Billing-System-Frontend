@@ -5,6 +5,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import StatusBadge from "../components/StatusBadge";
 import { fetchInvoiceById, markInvoiceAsPaid } from "../api/invoiceApi";
+import "../styles/invoice-management.css";
 
 const money = (num) => `INR ${num.toLocaleString("en-IN")}`;
 const GST_RATE = 5;

@@ -5,6 +5,7 @@ import InvoiceTable from "../components/InvoiceTable";
 import TopFilters from "../components/TopFilters";
 import { fetchInvoices } from "../api/invoiceApi";
 import { invoices as invoiceSeed } from "../data/invoices";
+import "../styles/invoice-management.css";
 
 const initialFilters = {
   buyer: "",
