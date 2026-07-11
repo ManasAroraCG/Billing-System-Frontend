@@ -1,6 +1,6 @@
 .insights-modal {
   width: 900px;
-  max-width: 95vw;
+  max-width: min(95vw, 900px);
 
   background: #fff;
 
@@ -76,9 +76,16 @@
   overflow-x: auto;
 }
 
+.insights-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .insights-table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 420px;
 }
 
 .insights-table thead {
@@ -125,31 +132,33 @@
   .insights-modal {
     width: calc(100vw - 20px);
     padding: 16px;
+    max-height: 92vh;
   }
 
   .insights-grid {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 10px;
+    margin-bottom: 14px;
   }
 
   .insight-summary-card {
-    padding: 14px;
+    padding: 12px;
   }
 
   .insight-summary-card h2 {
-    font-size: 24px;
+    font-size: 22px;
   }
 
   .insight-summary-card h3 {
-    font-size: 16px;
+    font-size: 15px;
   }
 
   .recent-orders-section h4 {
-    font-size: 18px;
+    font-size: 16px;
   }
 
   .insights-table {
-    min-width: 550px;
+    min-width: 420px;
   }
 
   .modal-actions {

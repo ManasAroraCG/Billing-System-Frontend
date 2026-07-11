@@ -1,14 +1,17 @@
 import { useState, useRef, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import Navbar from '../components/Navbar';
+import { API_BASE_URL } from '../services/api';
 
 function InvoiceDetail() {
-  const location = useLocation();
+  const { invoiceId } = useParams();
   const navigate = useNavigate();
-  const transaction = location.state?.transaction;
-  
+
+  const [transaction, setTransaction] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(null);
   const [digitalSignature, setDigitalSignature] = useState(null);
   const [showSignaturePad, setShowSignaturePad] = useState(false);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -16,18 +19,81 @@ function InvoiceDetail() {
   const canvasRef = useRef(null);
 
   useEffect(() => {
-    if (!transaction) {
-      navigate('/invoices');
-    }
-  }, [transaction, navigate]);
+    const fetchInvoice = async () => {
+      try {
+        const token = sessionStorage.getItem('token');
+        if (!token) {
+          navigate('/invoices');
+          return;
+        }
+        const response = await fetch(`${API_BASE_URL}/Invoices/${invoiceId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        if (response.status === 404) {
+          navigate('/invoices');
+          return;
+        }
+        if (!response.ok) {
+          throw new Error('Failed to load invoice');
+        }
+        const result = await response.json();
+        setTransaction(result.data || result);
+      } catch (err) {
+        setFetchError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchInvoice();
+  }, [invoiceId, navigate]);
 
-  if (!transaction) {
-    return null;
+  if (loading) {
+    return (
+      <div style={{ minHeight: '100vh', background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <p style={{ fontFamily: "'Inter', sans-serif", color: '#7b6d60', fontSize: '15px' }}>Loading invoice...</p>
+      </div>
+    );
   }
 
-  const subtotal = transaction.items.reduce((sum, item) => sum + (item.quantity * item.price), 0);
-  const gst = subtotal * (transaction.gst / 100);
-  const grandTotal = subtotal + gst;
+  if (fetchError) {
+    return (
+      <div style={{ minHeight: '100vh', background: '#f0f0f0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
+        <p style={{ fontFamily: "'Inter', sans-serif", color: '#dc2626', fontSize: '14px' }}>{fetchError}</p>
+        <button onClick={() => navigate('/invoices')} style={{ padding: '8px 18px', borderRadius: '8px', border: '1px solid #ddd7cc', background: 'white', cursor: 'pointer', fontFamily: "'Inter', sans-serif" }}>Back to Invoices</button>
+      </div>
+    );
+  }
+
+  if (!transaction) return null;
+
+  // Map API fields
+  const company = transaction.companySnapshot || {};
+  const buyer = transaction.customerSnapshot || {};
+
+  const companyName = company.name || company.companyName || 'AQUA SANITARY SOLUTIONS';
+  const companyAddress = company.address || '123, Industrial Area, Sector 12 | New Delhi - 110001, India';
+  const companyPhone = company.phone || '+91 98765 43210';
+  const companyEmail = company.email || 'info@aquasanitary.com';
+  const companyGstin = company.gstin || '07AABCU9603R1Z8';
+  const companyPan = company.pan || company.panNumber || 'AABCU9603R';
+
+  const buyerName = buyer.partyName || transaction.partyName || '';
+  const buyerAddress = buyer.billingAddress || transaction.billingAddress || '';
+  const buyerPhone = buyer.phone || transaction.phone || '';
+  const buyerGstin = buyer.gstin || transaction.partyGstin || '';
+
+  const invoiceNumber = transaction.invoiceNumber || '';
+  const invoiceDate = transaction.invoiceDate || '';
+  const invoiceStatus = (transaction.status || 'pending').toLowerCase();
+  const items = transaction.items || [];
+
+  const subtotal = transaction.subTotal || 0;
+  const gstAmount = transaction.totalGst || 0;
+  const grandTotal = transaction.grandTotal || 0;
+  const amountInWords = transaction.totalInWords || numberToWords(grandTotal);
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-IN', {
@@ -170,7 +236,7 @@ function InvoiceDetail() {
         heightLeft -= pdfHeight;
       }
       
-      pdf.save(`Invoice_${transaction.invoiceId}.pdf`);
+      pdf.save(`Invoice_${invoiceNumber}.pdf`);
     } catch (err) {
       console.error('PDF generation failed:', err);
       alert('Failed to generate PDF. Please try again or use Print to PDF.');
@@ -211,7 +277,7 @@ function InvoiceDetail() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Invoice_${transaction.invoiceId}.doc`;
+    a.download = `Invoice_${invoiceNumber}.doc`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -221,8 +287,8 @@ function InvoiceDetail() {
   // Share
   const handleShare = async () => {
     const shareData = {
-      title: `Invoice ${transaction.invoiceId} - AQUA Sanitary Solutions`,
-      text: `Invoice Total: ${formatCurrency(grandTotal)}\nBuyer: ${transaction.buyerName}`,
+      title: `Invoice ${invoiceNumber} - ${companyName}`,
+      text: `Invoice Total: ${formatCurrency(grandTotal)}\nBuyer: ${buyerName}`,
       url: window.location.href
     };
 
@@ -573,16 +639,16 @@ function InvoiceDetail() {
               margin: '0 0 5px 0',
               color: '#000'
             }}>
-              AQUA SANITARY SOLUTIONS
+              {companyName}
             </h1>
             <p style={{ margin: '3px 0', fontSize: '12px', color: '#555' }}>
-              123, Industrial Area, Sector 12 | New Delhi - 110001, India
+              {companyAddress}
             </p>
             <p style={{ margin: '3px 0', fontSize: '12px', color: '#555' }}>
-              Phone: +91 98765 43210 | Email: info@aquasanitary.com
+              Phone: {companyPhone} | Email: {companyEmail}
             </p>
             <p style={{ margin: '3px 0', fontSize: '12px', color: '#555' }}>
-              GSTIN: 07AABCU9603R1Z8 | PAN: AABCU9603R
+              GSTIN: {companyGstin} | PAN: {companyPan}
             </p>
           </div>
 
@@ -627,16 +693,16 @@ function InvoiceDetail() {
                     Bill To:
                   </h3>
                   <p style={{ margin: '2px 0', fontSize: '12px', fontWeight: 'bold' }}>
-                    {transaction.buyerName}
+                    {buyerName}
                   </p>
                   <p style={{ margin: '2px 0', fontSize: '11px', color: '#555' }}>
-                    {transaction.address}
+                    {buyerAddress}
                   </p>
                   <p style={{ margin: '2px 0', fontSize: '11px', color: '#555' }}>
-                    Phone: {transaction.phone}
+                    Phone: {buyerPhone}
                   </p>
                   <p style={{ margin: '2px 0', fontSize: '11px', color: '#555' }}>
-                    GSTIN: {transaction.buyerGST}
+                    GSTIN: {buyerGstin}
                   </p>
                 </td>
                 <td style={{
@@ -649,16 +715,16 @@ function InvoiceDetail() {
                     <tbody>
                       <tr>
                         <td style={{ border: 'none', padding: '2px 10px 2px 0', fontWeight: 'bold', fontSize: '11px', textAlign: 'right' }}>Invoice No:</td>
-                        <td style={{ border: 'none', padding: '2px 0', fontSize: '11px' }}>{transaction.invoiceId}</td>
+                        <td style={{ border: 'none', padding: '2px 0', fontSize: '11px' }}>{invoiceNumber}</td>
                       </tr>
                       <tr>
                         <td style={{ border: 'none', padding: '2px 10px 2px 0', fontWeight: 'bold', fontSize: '11px', textAlign: 'right' }}>Date:</td>
-                        <td style={{ border: 'none', padding: '2px 0', fontSize: '11px' }}>{formatDate(transaction.date)}</td>
+                        <td style={{ border: 'none', padding: '2px 0', fontSize: '11px' }}>{formatDate(invoiceDate)}</td>
                       </tr>
                       <tr>
                         <td style={{ border: 'none', padding: '2px 10px 2px 0', fontWeight: 'bold', fontSize: '11px', textAlign: 'right' }}>Status:</td>
-                        <td style={{ border: 'none', padding: '2px 0', fontSize: '11px', fontWeight: 'bold', color: transaction.status === 'paid' ? '#166534' : transaction.status === 'due' ? '#92400e' : '#9d174d' }}>
-                          {transaction.status.toUpperCase()}
+                        <td style={{ border: 'none', padding: '2px 0', fontSize: '11px', fontWeight: 'bold', color: invoiceStatus === 'paid' ? '#166534' : invoiceStatus === 'due' ? '#92400e' : '#9d174d' }}>
+                          {invoiceStatus.toUpperCase()}
                         </td>
                       </tr>
                     </tbody>
@@ -686,19 +752,26 @@ function InvoiceDetail() {
                 </tr>
               </thead>
               <tbody>
-                {transaction.items.map((item, index) => (
+                {items.map((item, index) => {
+                  const itemName = item.productName || item.name || item.description || '';
+                  const itemModel = item.hsnCode || item.model || '';
+                  const itemQty = item.quantity || 0;
+                  const itemRate = item.rate || item.unitPrice || item.price || 0;
+                  const itemAmount = item.amount || (itemQty * itemRate);
+                  return (
                   <tr key={index}>
                     <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'center', fontSize: '11px' }}>{index + 1}</td>
                     <td style={{ border: '1px solid #000', padding: '8px', fontSize: '11px' }}>
-                      <div style={{ fontWeight: '500' }}>{item.name}</div>
-                      <div style={{ fontSize: '9px', color: '#666', marginTop: '2px' }}>Model: #{item.model}</div>
+                      <div style={{ fontWeight: '500' }}>{itemName}</div>
+                      {itemModel && <div style={{ fontSize: '9px', color: '#666', marginTop: '2px' }}>Model: #{itemModel}</div>}
                     </td>
-                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'center', fontSize: '10px' }}>7324</td>
-                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'center', fontSize: '11px' }}>{item.quantity}</td>
-                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right', fontSize: '11px' }}>{item.price.toFixed(2)}</td>
-                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right', fontSize: '11px', fontWeight: '500' }}>{(item.quantity * item.price).toFixed(2)}</td>
+                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'center', fontSize: '10px' }}>{item.hsnCode || '7324'}</td>
+                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'center', fontSize: '11px' }}>{itemQty}</td>
+                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right', fontSize: '11px' }}>{itemRate.toFixed(2)}</td>
+                    <td style={{ border: '1px solid #000', padding: '8px', textAlign: 'right', fontSize: '11px', fontWeight: '500' }}>{itemAmount.toFixed(2)}</td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -723,7 +796,7 @@ function InvoiceDetail() {
                 paddingTop: '8px',
                 lineHeight: '1.4'
               }}>
-                {numberToWords(grandTotal)}
+                {amountInWords}
               </p>
               <p style={{ fontSize: '9px', color: '#888', marginTop: '10px', fontStyle: 'italic' }}>
                 * This is a computer generated invoice
@@ -739,9 +812,9 @@ function InvoiceDetail() {
                     </td>
                   </tr>
                   <tr>
-                    <td style={{ border: '1px solid #000', padding: '8px 12px', fontSize: '12px', background: '#fafafa' }}>IGST @ {transaction.gst}%</td>
+                    <td style={{ border: '1px solid #000', padding: '8px 12px', fontSize: '12px', background: '#fafafa' }}>GST</td>
                     <td style={{ border: '1px solid #000', padding: '8px 12px', textAlign: 'right', fontSize: '12px', background: '#fafafa' }}>
-                      &#8377; {gst.toFixed(2)}
+                      &#8377; {gstAmount.toFixed(2)}
                     </td>
                   </tr>
                   <tr>
@@ -780,7 +853,7 @@ function InvoiceDetail() {
               <div style={{ width: '180px', height: '1px', background: '#000', marginTop: '30px' }} />
             </div>
             <div style={{ textAlign: 'right' }}>
-              <p style={{ fontSize: '11px', fontWeight: 'bold', margin: '0 0 5px 0' }}>For AQUA SANITARY SOLUTIONS</p>
+              <p style={{ fontSize: '11px', fontWeight: 'bold', margin: '0 0 5px 0' }}>For {companyName}</p>
               {digitalSignature ? (
                 <img 
                   src={digitalSignature} 

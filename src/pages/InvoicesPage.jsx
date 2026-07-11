@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { jsPDF } from 'jspdf';
 import Navbar from '../components/Navbar';
+import { API_BASE_URL } from '../services/api';
 
 function Invoices() {
   const navigate = useNavigate();
@@ -11,90 +12,97 @@ function Invoices() {
   const [filteredTransactions, setFilteredTransactions] = useState([]);
   const [isExporting, setIsExporting] = useState(false);
 
-  // Sample transaction data
-  const [transactions] = useState([
-    {
-      id: 1,
-      invoiceId: 'INV-284761',
-      buyerName: 'Apex Architecture Hub',
-      date: '2024-01-15',
-      address: 'Kolkata, WB',
-      phone: '+91 98765 43210',
-      amount: 4520000,
-      status: 'paid',
-      items: [
-        { name: 'Premium Basin Mixer', model: 'PBM-101', quantity: 5, price: 4500 },
-        { name: 'Wall Hung WC', model: 'WHW-202', quantity: 3, price: 8500 }
-      ],
-      gst: 5,
-      buyerGST: '19AAAAA0000A1Z5'
-    },
-    {
-      id: 2,
-      invoiceId: 'INV-284762',
-      buyerName: 'Blue Chip Sanitaryware',
-      date: '2024-01-20',
-      address: 'Ahmedabad, GJ',
-      phone: '+91 70001 00001',
-      amount: 12800000,
-      status: 'due',
-      items: [
-        { name: 'Bathroom Vanity Set', model: 'BVS-301', quantity: 2, price: 15000 },
-        { name: 'Rain Shower Head', model: 'RSH-401', quantity: 4, price: 3200 }
-      ],
-      gst: 5,
-      buyerGST: '24BBBB1111B2Z6'
-    },
-    {
-      id: 3,
-      invoiceId: 'INV-284763',
-      buyerName: 'Dream World Projects',
-      date: '2024-02-01',
-      address: 'Mumbai, MH',
-      phone: '+91 99999 88888',
-      amount: 3210000,
-      status: 'pending',
-      items: [
-        { name: 'Kitchen Sink', model: 'KS-501', quantity: 3, price: 6500 },
-        { name: 'Faucet Set', model: 'FS-601', quantity: 3, price: 2800 }
-      ],
-      gst: 5,
-      buyerGST: '27CCCCC2222C3Z7'
-    },
-    {
-      id: 4,
-      invoiceId: 'INV-284764',
-      buyerName: 'Green Valley Developers',
-      date: '2024-02-10',
-      address: 'Bangalore, KA',
-      phone: '+91 88888 77777',
-      amount: 6750000,
-      status: 'paid',
-      items: [
-        { name: 'Water Heater', model: 'WH-701', quantity: 2, price: 12000 },
-        { name: 'Shower Panel', model: 'SP-801', quantity: 1, price: 18500 }
-      ],
-      gst: 5,
-      buyerGST: '29DDDDD3333D4Z8'
-    },
-    {
-      id: 5,
-      invoiceId: 'INV-284765',
-      buyerName: 'Sunrise Constructions',
-      date: '2024-02-25',
-      address: 'Chennai, TN',
-      phone: '+91 77777 66666',
-      amount: 8940000,
-      status: 'due',
-      items: [
-        { name: 'Floor Mounted WC', model: 'FMW-901', quantity: 4, price: 9500 },
-        { name: 'Basin Mixer', model: 'BM-1001', quantity: 4, price: 4200 }
-      ],
-      gst: 5,
-      buyerGST: '33EEEEE4444E5Z9'
-    }
-  ]);
+  // API States
+  const [transactions, setTransactions] = useState([]);
+  const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
+  // Fetch Customers API
+  const fetchCustomers = async () => {
+    try {
+      const token = sessionStorage.getItem("token");
+      if (!token) {
+        setError("Authentication token not found");
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/Customers`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch customers: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const list = Array.isArray(data?.data) ? data.data : [];
+      setCustomers(list);
+    } catch (err) {
+      setError(`Error fetching customers: ${err.message}`);
+      console.error("Fetch customers error:", err);
+    }
+  };
+
+  // Fetch Invoices API
+  const fetchInvoices = async () => {
+    try {
+      setLoading(true);
+      const token = sessionStorage.getItem("token");
+      if (!token) {
+        setError("Authentication token not found");
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/Invoices`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch invoices: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const raw = Array.isArray(data?.data?.data) ? data.data.data : [];
+
+      // Map API response to UI structure
+      const mappedTransactions = raw.map((invoice, index) => ({
+        id: invoice.id || index,
+        invoiceId: invoice.invoiceNumber || "",
+        buyerName: invoice.partyName || "",
+        date: invoice.invoiceDate || "",
+        address: invoice.billingAddress || "-",
+        phone: invoice.phone || "-",
+        amount: invoice.grandTotal || 0,
+        status: (invoice.status || "pending").toLowerCase()
+      }));
+
+      setTransactions(mappedTransactions);
+      setError("");
+    } catch (err) {
+      setError(`Error fetching invoices: ${err.message}`);
+      console.error("Fetch invoices error:", err);
+      setTransactions([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load APIs on component mount
+  useEffect(() => {
+    fetchCustomers();
+    fetchInvoices();
+  }, []);
+
+  // Filter transactions based on selected criteria
   useEffect(() => {
     let filtered = [...transactions];
 
@@ -103,7 +111,7 @@ function Invoices() {
     }
 
     if (selectedDate) {
-      filtered = filtered.filter((t) => t.date === selectedDate);
+      filtered = filtered.filter((t) => t.date.slice(0, 10) === selectedDate);
     }
 
     if (invoiceNumber && invoiceNumber.length === 6) {
@@ -114,12 +122,8 @@ function Invoices() {
     setFilteredTransactions(filtered);
   }, [selectedBuyer, selectedDate, invoiceNumber, transactions]);
 
-  const buyerNames = [...new Set(transactions.map((t) => t.buyerName))];
-
   const handleInvoiceClick = (transaction) => {
-    navigate(`/invoice/${transaction.invoiceId}`, {
-      state: { transaction }
-    });
+    navigate(`/invoice/${transaction.id}`);
   };
 
   const formatCurrency = (amount) => {
@@ -423,53 +427,82 @@ function Invoices() {
           </p>
         </div>
 
-        <div style={{
-          display: 'flex',
-          gap: '16px',
-          marginBottom: '24px',
-          flexWrap: 'wrap',
-          alignItems: 'flex-end',
-          justifyContent: 'center'
-        }}>
+        {error && (
           <div style={{
-            width: '220px',
-            minWidth: '200px'
+            background: '#fee2e2',
+            border: '1px solid #fca5a5',
+            color: '#991b1b',
+            padding: '12px 16px',
+            borderRadius: '8px',
+            marginBottom: '16px',
+            fontSize: '13px'
           }}>
-            <label style={{
-              display: 'block',
-              fontSize: '12px',
-              fontWeight: 600,
-              color: '#7b6d60',
-              marginBottom: '6px',
-              letterSpacing: '0.5px',
-              textTransform: 'uppercase'
-            }}>
-              Select Buyer
-            </label>
-            <select
-              value={selectedBuyer}
-              onChange={(e) => setSelectedBuyer(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '10px 14px',
-                borderRadius: '10px',
-                border: '1px solid #ddd7cc',
-                background: 'white',
-                fontSize: '14px',
-                color: '#2C1810',
-                fontFamily: "'Inter', sans-serif",
-                cursor: 'pointer',
-                outline: 'none',
-                transition: 'border-color 0.2s',
-                boxSizing: 'border-box'
-              }}
-            >
-              <option value="">All Buyers</option>
-              {buyerNames.map((name, index) => (
-                <option key={index} value={name}>{name}</option>
-              ))}
-            </select>
+            {error}
           </div>
+        )}
+
+        {loading && (
+          <div style={{
+            textAlign: 'center',
+            padding: '32px 16px',
+            color: '#7b6d60',
+            fontSize: '14px'
+          }}>
+            Loading invoices...
+          </div>
+        )}
+
+        {!loading && (
+          <>
+            <div style={{
+              display: 'flex',
+              gap: '16px',
+              marginBottom: '24px',
+              flexWrap: 'wrap',
+              alignItems: 'flex-end',
+              justifyContent: 'center'
+            }}>
+              <div style={{
+                width: '220px',
+                minWidth: '200px'
+              }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  color: '#7b6d60',
+                  marginBottom: '6px',
+                  letterSpacing: '0.5px',
+                  textTransform: 'uppercase'
+                }}>
+                  Select Buyer
+                </label>
+                <select
+                  value={selectedBuyer}
+                  onChange={(e) => setSelectedBuyer(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: '10px',
+                    border: '1px solid #ddd7cc',
+                    background: 'white',
+                    fontSize: '14px',
+                    color: '#2C1810',
+                    fontFamily: "'Inter', sans-serif",
+                    cursor: 'pointer',
+                    outline: 'none',
+                    transition: 'border-color 0.2s',
+                    boxSizing: 'border-box'
+                  }}
+                >
+                  <option value="">All Buyers</option>
+                  {customers.map((customer) => (
+                    <option key={customer.id} value={customer.partyName}>
+                      {customer.partyName}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
           <div style={{
             width: '200px',
@@ -624,97 +657,97 @@ function Invoices() {
           </div>
         </div>
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-          gap: '14px',
-          marginBottom: '24px'
-        }}>
-          <div style={{
-            background: '#f8f6f3',
-            borderRadius: '12px',
-            padding: '16px',
-            border: '1px solid #eeeae3'
-          }}>
-            <p style={{ fontSize: '12px', color: '#7b6d60', margin: '0 0 4px 0', fontWeight: 500 }}>Total Invoices</p>
-            <h3 style={{ fontSize: '24px', color: '#2C1810', margin: 0, fontWeight: 700 }}>{filteredTransactions.length}</h3>
-          </div>
-          <div style={{
-            background: '#f8f6f3',
-            borderRadius: '12px',
-            padding: '16px',
-            border: '1px solid #eeeae3'
-          }}>
-            <p style={{ fontSize: '12px', color: '#7b6d60', margin: '0 0 4px 0', fontWeight: 500 }}>Total Amount</p>
-            <h3 style={{ fontSize: '24px', color: '#8B6914', margin: 0, fontWeight: 700 }}>
-              {formatCurrency(filteredTransactions.reduce((sum, t) => sum + t.amount, 0))}
-            </h3>
-          </div>
-          <div style={{
-            background: '#f8f6f3',
-            borderRadius: '12px',
-            padding: '16px',
-            border: '1px solid #eeeae3'
-          }}>
-            <p style={{ fontSize: '12px', color: '#7b6d60', margin: '0 0 4px 0', fontWeight: 500 }}>Paid</p>
-            <h3 style={{ fontSize: '24px', color: '#166534', margin: 0, fontWeight: 700 }}>
-              {filteredTransactions.filter(t => t.status === 'paid').length}
-            </h3>
-          </div>
-          <div style={{
-            background: '#f8f6f3',
-            borderRadius: '12px',
-            padding: '16px',
-            border: '1px solid #eeeae3'
-          }}>
-            <p style={{ fontSize: '12px', color: '#7b6d60', margin: '0 0 4px 0', fontWeight: 500 }}>Due</p>
-            <h3 style={{ fontSize: '24px', color: '#92400e', margin: 0, fontWeight: 700 }}>
-              {filteredTransactions.filter(t => t.status === 'due').length}
-            </h3>
-          </div>
-          <div style={{
-            background: '#f8f6f3',
-            borderRadius: '12px',
-            padding: '16px',
-            border: '1px solid #eeeae3'
-          }}>
-            <p style={{ fontSize: '12px', color: '#7b6d60', margin: '0 0 4px 0', fontWeight: 500 }}>Pending</p>
-            <h3 style={{ fontSize: '24px', color: '#9d174d', margin: 0, fontWeight: 700 }}>
-              {filteredTransactions.filter(t => t.status === 'pending').length}
-            </h3>
-          </div>
-        </div>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+              gap: '14px',
+              marginBottom: '24px'
+            }}>
+              <div style={{
+                background: '#f8f6f3',
+                borderRadius: '12px',
+                padding: '16px',
+                border: '1px solid #eeeae3'
+              }}>
+                <p style={{ fontSize: '12px', color: '#7b6d60', margin: '0 0 4px 0', fontWeight: 500 }}>Total Invoices</p>
+                <h3 style={{ fontSize: '24px', color: '#2C1810', margin: 0, fontWeight: 700 }}>{filteredTransactions.length}</h3>
+              </div>
+              <div style={{
+                background: '#f8f6f3',
+                borderRadius: '12px',
+                padding: '16px',
+                border: '1px solid #eeeae3'
+              }}>
+                <p style={{ fontSize: '12px', color: '#7b6d60', margin: '0 0 4px 0', fontWeight: 500 }}>Total Amount</p>
+                <h3 style={{ fontSize: '24px', color: '#8B6914', margin: 0, fontWeight: 700 }}>
+                  {formatCurrency(filteredTransactions.reduce((sum, t) => sum + t.amount, 0))}
+                </h3>
+              </div>
+              <div style={{
+                background: '#f8f6f3',
+                borderRadius: '12px',
+                padding: '16px',
+                border: '1px solid #eeeae3'
+              }}>
+                <p style={{ fontSize: '12px', color: '#7b6d60', margin: '0 0 4px 0', fontWeight: 500 }}>Paid</p>
+                <h3 style={{ fontSize: '24px', color: '#166534', margin: 0, fontWeight: 700 }}>
+                  {filteredTransactions.filter(t => t.status === 'paid').length}
+                </h3>
+              </div>
+              <div style={{
+                background: '#f8f6f3',
+                borderRadius: '12px',
+                padding: '16px',
+                border: '1px solid #eeeae3'
+              }}>
+                <p style={{ fontSize: '12px', color: '#7b6d60', margin: '0 0 4px 0', fontWeight: 500 }}>Due</p>
+                <h3 style={{ fontSize: '24px', color: '#92400e', margin: 0, fontWeight: 700 }}>
+                  {filteredTransactions.filter(t => t.status === 'due').length}
+                </h3>
+              </div>
+              <div style={{
+                background: '#f8f6f3',
+                borderRadius: '12px',
+                padding: '16px',
+                border: '1px solid #eeeae3'
+              }}>
+                <p style={{ fontSize: '12px', color: '#7b6d60', margin: '0 0 4px 0', fontWeight: 500 }}>Pending</p>
+                <h3 style={{ fontSize: '24px', color: '#9d174d', margin: 0, fontWeight: 700 }}>
+                  {filteredTransactions.filter(t => t.status === 'pending').length}
+                </h3>
+              </div>
+            </div>
 
-        <div style={{
-          background: 'white',
-          borderRadius: '16px',
-          border: '1px solid #eeeae3',
-          overflow: 'hidden'
-        }}>
-          <div style={{
-            padding: '16px 20px',
-            borderBottom: '1px solid #eeeae3',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}>
-            <h3 style={{
-              fontFamily: "'Playfair Display', serif",
-              fontSize: '20px',
-              fontWeight: 600,
-              color: '#2C1810',
-              margin: 0
+            <div style={{
+              background: 'white',
+              borderRadius: '16px',
+              border: '1px solid #eeeae3',
+              overflow: 'hidden'
             }}>
-              Transaction History
-            </h3>
-            <span style={{
-              fontSize: '13px',
-              color: '#7b6d60',
-              fontWeight: 500
-            }}>
-              {filteredTransactions.length} record{filteredTransactions.length !== 1 ? 's' : ''}
-            </span>
-          </div>
+              <div style={{
+                padding: '16px 20px',
+                borderBottom: '1px solid #eeeae3',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+                <h3 style={{
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: '20px',
+                  fontWeight: 600,
+                  color: '#2C1810',
+                  margin: 0
+                }}>
+                  Transaction History
+                </h3>
+                <span style={{
+                  fontSize: '13px',
+                  color: '#7b6d60',
+                  fontWeight: 500
+                }}>
+                  {filteredTransactions.length} record{filteredTransactions.length !== 1 ? 's' : ''}
+                </span>
+              </div>
 
           <div style={{ overflowX: 'auto' }}>
             <table style={{
@@ -933,8 +966,10 @@ function Invoices() {
                 )}
               </tbody>
             </table>
-          </div>
-        </div>
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       <style>{`

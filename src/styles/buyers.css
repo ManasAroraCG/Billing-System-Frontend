@@ -1,8 +1,16 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 .buyers-page {
   min-height: 100vh;
   background: #f8f7f4;
   padding: 70px 20px 20px;
   width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
   color: #2b1b13;
   line-height: 1.4;
 }
@@ -155,6 +163,12 @@
    MOBILE
 ========================== */
 
+@media (max-width: 1199px) {
+  .buyers-kpis {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 1024px) {
 
   .buyers-kpis {
@@ -166,20 +180,26 @@
 @media (max-width: 768px) {
 
   .buyers-page {
-    padding: 85px 12px 20px;
+    padding: 72px 12px 20px;
   }
 
   .buyers-top {
     flex-direction: column;
-    gap: 14px;
+    gap: 12px;
+    align-items: stretch;
   }
 
   .buyers-top h1 {
-    font-size: 26px;
+    font-size: 24px;
+  }
+
+  .buyers-top p {
+    font-size: 13px;
   }
 
   .buyers-actions {
     width: 100%;
+    flex-direction: row;
   }
 
   .buyers-actions button {
@@ -187,16 +207,20 @@
   }
 
   .buyers-kpis {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 10px;
   }
 
   .kpi-card {
-    padding: 14px;
+    padding: 12px;
   }
 
   .kpi-card h2 {
-    font-size: 24px;
+    font-size: 22px;
+  }
+
+  .drawer-overlay {
+    inset: 0;
   }
 }
 
@@ -204,4 +228,5 @@
 .buyers-page {
   overflow-x: hidden;
   width: 100%;
+  max-width: 100%;
 }

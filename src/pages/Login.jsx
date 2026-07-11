@@ -50,7 +50,7 @@ function LoginPage() {
       if (token) {
         sessionStorage.setItem("token", token);
 
-        navigate("/buyers");
+        navigate("/");
       } else {
         throw new Error("Token not found in response");
       }
