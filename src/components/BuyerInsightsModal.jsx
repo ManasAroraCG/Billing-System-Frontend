@@ -178,6 +178,7 @@ export default function BuyerInsightsModal({
                 Recent Transactions
               </h4>
 
+              <div className="insights-table-wrapper">
               <table className="insights-table">
                 <thead>
                   <tr>
@@ -243,6 +244,7 @@ export default function BuyerInsightsModal({
                   )}
                 </tbody>
               </table>
+              </div>
             </div>
 
             <div className="modal-actions">

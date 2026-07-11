@@ -60,6 +60,7 @@
   max-width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 .buyers-table {
   width: 100%;
@@ -237,6 +238,11 @@
     flex-direction: column;
     align-items: stretch;
     gap: 12px;
+    padding: 12px 14px;
+  }
+
+  .roster-left h3 {
+    font-size: 16px;
   }
 
   .roster-right {
@@ -248,12 +254,49 @@
   }
 
   .buyers-table {
-    min-width: 1050px;
+    min-width: 760px;
+  }
+
+  .buyers-table th {
+    padding: 10px 10px;
+    font-size: 11px;
+  }
+
+  .buyers-table td {
+    padding: 10px 10px;
+  }
+
+  .buyer-name {
+    font-size: 13px;
+  }
+
+  .buyer-location {
+    font-size: 11px;
+    max-width: 140px;
+  }
+
+  .contact-block div {
+    font-size: 12px;
+  }
+
+  .email-link {
+    font-size: 11px;
+  }
+
+  .revenue {
+    font-size: 13px;
+  }
+
+  .action-icons button {
+    width: 28px;
+    height: 28px;
   }
 
   .table-footer {
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
+    padding: 12px 14px;
+    font-size: 12px;
   }
 }

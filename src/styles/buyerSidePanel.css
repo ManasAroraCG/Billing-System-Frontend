@@ -209,11 +209,34 @@
   background: #f5f2ec;
 }
 
-/* MOBILE */
+.side-actions-sticky {
+  position: sticky;
+  bottom: 0;
+  background: white;
+  padding-top: 12px;
+  padding-bottom: 4px;
+  margin-top: auto;
+  border-top: 1px solid #ece7df;
+}
 
-@media (max-width: 768px) {
+/* ==========================================
+   TABLET (768px - 1199px)
+========================================== */
+
+@media (max-width: 1199px) {
   .buyer-side-panel {
-    top: 60px;
+    width: 320px;
+  }
+}
+
+/* ==========================================
+   MOBILE (<768px) — bottom sheet
+========================================== */
+
+@media (max-width: 767px) {
+  .buyer-side-panel {
+    top: auto;
+    bottom: 0;
     left: 0;
     right: 0;
 
@@ -221,63 +244,36 @@
     height: calc(100vh - 60px);
 
     border-left: none;
+    border-top: 1px solid #e7dfd2;
+    border-radius: 20px 20px 0 0;
 
-    border-radius: 18px 18px 0 0;
+    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.12);
 
     padding: 16px;
   }
 
   .buyer-profile-card {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .buyer-metrics {
-    grid-template-columns: 1fr;
+    flex-direction: row;
+    text-align: left;
   }
 
   .buyer-profile-name {
-    font-size: 16px;
+    font-size: 15px;
   }
 
   .buyer-profile-location {
     font-size: 12px;
   }
-}
 
-.buyer-side-panel * {
-  text-align: left;
-  box-sizing: border-box;
-}
+  .buyer-metrics {
+    grid-template-columns: 1fr 1fr;
+  }
 
-.buyer-profile-card {
-  display: flex !important;
-  align-items: center !important;
-  flex-direction: row !important;
-}
+  .buyer-metric-card span {
+    font-size: 18px;
+  }
 
-.buyer-metric-card {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.buyer-metric-card label {
-  width: 100%;
-}
-
-.buyer-metric-card span {
-  width: 100%;
-}
-
-.detail-group {
-  text-align: left !important;
-}
-
-.detail-group label {
-  text-align: left !important;
-}
-
-.detail-group span {
-  text-align: left !important;
+  .panel-header h3 {
+    font-size: 18px;
+  }
 }
