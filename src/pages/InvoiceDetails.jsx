@@ -569,11 +569,13 @@ function InvoiceDetail() {
       )}
 
       {/* Back Button */}
-      <div style={{ 
-        padding: '90px 40px 0',
-        maxWidth: '800px',
-        margin: '0 auto'
-      }}>
+      <div
+        className="invoice-back-btn-area"
+        style={{ 
+          padding: '90px 40px 0',
+          maxWidth: '800px',
+          margin: '0 auto'
+        }}>
         <button
           onClick={() => navigate('/invoices')}
           style={{
@@ -678,8 +680,8 @@ function InvoiceDetail() {
             paddingBottom: '15px'
           }}>
             <tbody>
-              <tr>
-                <td style={{
+              <tr className="bill-to-row">
+                <td className="bill-to-cell" style={{
                   border: 'none',
                   padding: '0 10px 15px 0',
                   verticalAlign: 'top',
@@ -705,13 +707,13 @@ function InvoiceDetail() {
                     GSTIN: {buyerGstin}
                   </p>
                 </td>
-                <td style={{
+                <td className="invoice-meta-cell" style={{
                   border: 'none',
                   padding: '0 0 15px 0',
                   verticalAlign: 'top',
                   textAlign: 'right'
                 }}>
-                  <table style={{ border: 'none', width: 'auto', marginLeft: 'auto' }}>
+                  <table className="invoice-meta-table" style={{ border: 'none', width: 'auto', marginLeft: 'auto' }}>
                     <tbody>
                       <tr>
                         <td style={{ border: 'none', padding: '2px 10px 2px 0', fontWeight: 'bold', fontSize: '11px', textAlign: 'right' }}>Invoice No:</td>
@@ -802,7 +804,7 @@ function InvoiceDetail() {
                 * This is a computer generated invoice
               </p>
             </div>
-            <div style={{ width: '280px', flexShrink: 0 }}>
+            <div className="summary-totals" style={{ width: '280px', flexShrink: 0 }}>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <tbody>
                   <tr>
@@ -883,6 +885,8 @@ function InvoiceDetail() {
       </div>
 
       <style>{`
+        * { box-sizing: border-box; }
+
         @media print {
           .no-print, .action-buttons {
             display: none !important;
@@ -893,6 +897,9 @@ function InvoiceDetail() {
           .invoice-detail {
             padding: 0 !important;
             max-width: 100% !important;
+          }
+          .invoice-back-btn-area {
+            display: none !important;
           }
           .bill-content {
             box-shadow: none !important;
@@ -907,64 +914,108 @@ function InvoiceDetail() {
           }
         }
 
+        /* ===== TABLET ===== */
         @media (max-width: 900px) {
+          .invoice-back-btn-area {
+            padding: 80px 20px 0 !important;
+          }
           .invoice-detail {
-            padding: 0 20px 30px !important;
+            padding: 0 20px 130px !important;
           }
           .action-buttons {
             position: fixed !important;
             top: auto !important;
-            bottom: 20px !important;
-            right: 20px !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
             flex-direction: row !important;
-            gap: 8px !important;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-          }
-          .action-buttons button {
-            padding: 10px 16px !important;
-            font-size: 12px !important;
-          }
-          .btn-text {
-            display: inline !important;
-          }
-        }
-
-        @media (max-width: 768px) {
-          .invoice-detail {
-            padding: 0 10px 80px !important;
-          }
-          .bill-content {
-            padding: 20px 15px 25px !important;
-          }
-          .bill-content h1 {
-            font-size: 16px !important;
-          }
-          .bill-content h2 {
-            font-size: 14px !important;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .invoice-detail {
-            padding: 0 8px 70px !important;
-          }
-          .bill-content {
-            padding: 15px 12px 20px !important;
-          }
-          .bill-content h1 {
-            font-size: 14px !important;
-          }
-          .action-buttons {
-            left: 10px !important;
-            right: 10px !important;
-            bottom: 10px !important;
-            justify-content: center !important;
+            gap: 0 !important;
+            flex-wrap: nowrap !important;
+            background: white !important;
+            border-top: 1px solid #e5e0d8 !important;
+            padding: 10px 12px !important;
+            box-shadow: 0 -4px 20px rgba(0,0,0,.1) !important;
+            z-index: 200 !important;
           }
           .action-buttons button {
             flex: 1 !important;
-            padding: 10px 8px !important;
-            font-size: 11px !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 4px !important;
+            padding: 8px 4px !important;
+            font-size: 10px !important;
+            border-radius: 8px !important;
+            white-space: nowrap !important;
+            box-shadow: none !important;
+          }
+        }
+
+        /* ===== MOBILE ===== */
+        @media (max-width: 768px) {
+          .invoice-back-btn-area {
+            padding: 74px 12px 0 !important;
+          }
+          .invoice-detail {
+            padding: 0 12px 130px !important;
+          }
+          .bill-content {
+            padding: 16px 14px 22px !important;
+          }
+          .bill-content h1 {
+            font-size: 15px !important;
+            letter-spacing: 1px !important;
+          }
+          .bill-content h2 {
+            font-size: 13px !important;
+          }
+
+          /* Stack Bill To / Invoice meta on mobile */
+          .bill-to-row {
+            display: block !important;
+          }
+          .bill-to-cell {
+            display: block !important;
+            width: 100% !important;
+            padding: 0 0 12px 0 !important;
+          }
+          .invoice-meta-cell {
+            display: block !important;
+            width: 100% !important;
+            text-align: left !important;
+            padding: 12px 0 0 0 !important;
+            border-top: 1px dashed #ccc !important;
+          }
+          .invoice-meta-table {
+            margin-left: 0 !important;
+            width: 100% !important;
+          }
+          .invoice-meta-cell td {
+            text-align: left !important;
+          }
+
+          /* Make summary totals full-width */
+          .summary-totals {
+            width: 100% !important;
+          }
+        }
+
+        /* ===== SMALL MOBILE ===== */
+        @media (max-width: 480px) {
+          .invoice-back-btn-area {
+            padding: 72px 8px 0 !important;
+          }
+          .invoice-detail {
+            padding: 0 8px 120px !important;
+          }
+          .bill-content {
+            padding: 14px 10px 18px !important;
+          }
+          .bill-content h1 {
+            font-size: 13px !important;
+          }
+          .action-buttons button span.btn-text {
+            font-size: 9px !important;
           }
         }
       `}</style>
