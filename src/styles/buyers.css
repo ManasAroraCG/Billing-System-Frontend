@@ -6,10 +6,13 @@
   min-height: 100vh;
   background: #f7f5f1;
   padding: 95px 24px 24px;
-  max-width: 1450px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: none;
+  margin: 0;
   color: #2b1b13;
-  font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.5;
+  box-sizing: border-box;
 }
 
 /* ==========================================
@@ -25,15 +28,18 @@
 
 .buyers-top h1 {
   margin: 0;
-  font-size: 30px;
+  font-size: 34px;
   font-weight: 600;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.7px;
   color: #2b1b13;
+  font-family: "Playfair Display", serif;
+  line-height: 1.2;
 }
 
 .buyers-top p {
   margin-top: 6px;
   font-size: 14px;
+  font-weight: 400;
   color: #7b6d60;
 }
 
@@ -52,6 +58,8 @@
   padding: 0 18px;
   font-size: 13px;
   font-weight: 600;
+  font-family: "Inter", sans-serif;
+  letter-spacing: 0.2px;
   cursor: pointer;
   transition: 0.25s;
 }
@@ -96,6 +104,8 @@
 
 .kpi-label {
   font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
   color: #7b6d60;
 }
 
@@ -104,10 +114,13 @@
   font-size: 24px;
   font-weight: 700;
   color: #957418;
+  font-family: "Playfair Display", serif;
+  line-height: 1.15;
 }
 
 .kpi-card p {
   font-size: 13px;
+  font-weight: 400;
   color: #7b6d60;
   margin: 0;
 }
@@ -157,9 +170,11 @@
 
 .roster-left h3 {
   margin: 0;
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 600;
   color: #2b1b13;
+  font-family: "Playfair Display", serif;
+  letter-spacing: -0.2px;
 }
 
 .roster-tags {
@@ -174,6 +189,8 @@
   color: #666;
   font-size: 11px;
   font-weight: 600;
+  font-family: "Inter", sans-serif;
+  letter-spacing: 0.5px;
 }
 
 .tag.active {
@@ -190,6 +207,7 @@
 .roster-right span {
   color: #7b6d60;
   font-size: 14px;
+  font-weight: 500;
 }
 
 .roster-right select {
@@ -198,6 +216,9 @@
   background: white;
   padding: 10px 14px;
   color: #2b1b13;
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
 }
 
 /* ==========================================
@@ -216,15 +237,18 @@
 .buyers-table th {
   text-align: left;
   padding: 14px 18px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  font-family: "Inter", sans-serif;
   color: #8b7b68;
 }
 
 .buyers-table td {
   padding: 14px 18px;
   border-top: 1px solid #ddd7cc;
+  font-size: 14px;
+  font-family: "Inter", sans-serif;
 }
 
 .buyers-table tbody tr {
@@ -262,11 +286,13 @@
   font-size: 15px;
   font-weight: 600;
   color: #2b1b13;
+  line-height: 1.35;
 }
 
 .buyer-location {
   margin-top: 2px;
   font-size: 12px;
+  font-weight: 400;
   color: #7b6d60;
 }
 
@@ -282,16 +308,20 @@
 
 .contact-block div {
   color: #2b1b13;
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .email-link {
   color: #957418;
   text-decoration: none;
   font-size: 12px;
+  font-weight: 500;
 }
 
 .revenue {
   font-weight: 700;
+  letter-spacing: 0.2px;
 }
 
 /* ==========================================
@@ -317,6 +347,8 @@
   margin-top: 2px;
   color: #7b6d60;
   font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
 }
 
 /* ==========================================
@@ -357,6 +389,7 @@
   border-top: 1px solid #ddd7cc;
   color: #7b6d60;
   font-size: 13px;
+  font-weight: 500;
 }
 
 .pagination {
@@ -513,6 +546,10 @@
 .panel-header h3 {
   margin: 0;
   color: #2b1b13;
+  font-family: "Playfair Display", serif;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
 }
 
 .buyer-profile {
@@ -536,11 +573,12 @@
 
 .buyer-profile-name {
   font-weight: 600;
+  font-size: 16px;
   color: #2b1b13;
 }
 
 .buyer-profile-location {
-  font-size: 12px;
+  font-size: 13px;
   color: #7b6d60;
   margin-top: 2px;
 }
@@ -552,6 +590,8 @@
 .detail-group label {
   display: block;
   font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
   color: #7b6d60;
   margin-bottom: 4px;
 }
@@ -559,6 +599,7 @@
 .detail-group span {
   color: #2b1b13;
   font-weight: 500;
+  font-size: 14px;
 }
 
 .revenue-highlight {
@@ -639,6 +680,10 @@
 .modal-header h3 {
   margin: 0;
   color: #2b1b13;
+  font-family: "Playfair Display", serif;
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.4px;
 }
 
 .modal-close {
@@ -664,6 +709,7 @@
   margin-bottom: 6px;
   font-size: 13px;
   font-weight: 600;
+  font-family: "Inter", sans-serif;
   color: #6d5e55;
 }
 
@@ -674,6 +720,7 @@
   border-radius: 10px;
   background: white;
   font-size: 14px;
+  font-family: "Inter", sans-serif;
 }
 
 .form-group input:focus,
@@ -697,6 +744,7 @@
   margin-bottom: 16px;
   color: #7b6d60;
   font-size: 14px;
+  font-weight: 400;
 }
 
 .pricing-table {
@@ -713,13 +761,16 @@
   text-align: left;
   padding: 12px;
   font-size: 12px;
+  font-weight: 600;
   color: #7b6d60;
   letter-spacing: 0.5px;
+  font-family: "Inter", sans-serif;
 }
 
 .pricing-table td {
   padding: 14px 12px;
   border-top: 1px solid #ddd7cc;
+  font-size: 14px;
 }
 
 .pricing-table input {
@@ -727,6 +778,7 @@
   padding: 8px 10px;
   border: 1px solid #d7d2c8;
   border-radius: 8px;
+  font-family: "Inter", sans-serif;
 }
 
 /* ==========================
@@ -756,6 +808,7 @@
   display: block;
   color: #7b6d60;
   font-size: 13px;
+  font-weight: 500;
   margin-bottom: 8px;
 }
 
@@ -763,11 +816,17 @@
   margin: 0;
   color: #2b1b13;
   font-size: 24px;
+  font-family: "Playfair Display", serif;
+  font-weight: 600;
 }
 
 .recent-orders-section h4 {
   margin-bottom: 14px;
   color: #2b1b13;
+  font-family: "Playfair Display", serif;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
 }
 
 .insights-table {
@@ -783,12 +842,16 @@
   text-align: left;
   padding: 12px;
   font-size: 12px;
+  font-weight: 600;
   color: #7b6d60;
+  font-family: "Inter", sans-serif;
 }
 
 .insights-table td {
   padding: 12px;
   border-top: 1px solid #ddd7cc;
+  font-size: 14px;
+  font-family: "Inter", sans-serif;
 }
 
 .insights-table tr:hover {

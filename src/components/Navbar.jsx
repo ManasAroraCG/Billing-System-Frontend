@@ -1,8 +1,9 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [scrolled, setScrolled] = useState(false);
   const [onDarkSection, setOnDarkSection] = useState(true);
@@ -137,6 +138,12 @@ function Navbar() {
     },
   ];
 
+  const handleAddBuyerClick = () => {
+    navigate("/buyers", {
+      state: { openAddBuyer: true },
+    });
+  };
+
   
 
   return (
@@ -263,11 +270,7 @@ function Navbar() {
       return (
         <button
           key={path}
-          onClick={() => {
-            window.dispatchEvent(
-              new CustomEvent("openAddBuyerModal")
-            );
-          }}
+          onClick={handleAddBuyerClick}
           style={{
             color: textColor,
             textDecoration: "none",

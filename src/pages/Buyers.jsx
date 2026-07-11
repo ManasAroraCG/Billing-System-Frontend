@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 import "../styles/buyers.css";
 
@@ -16,6 +16,7 @@ import Navbar from "../components/Navbar";
 
 export default function Buyers() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [buyers, setBuyers] = useState([
     {
@@ -73,22 +74,16 @@ export default function Buyers() {
   const [showInsightsModal, setShowInsightsModal] = useState(false);
 
   useEffect(() => {
-  const handleOpenBuyerModal = () => {
-    setShowNewBuyerModal(true);
-  };
+    if (location.state?.openAddBuyer) {
+      setShowNewBuyerModal(true);
 
-  window.addEventListener(
-    "openAddBuyerModal",
-    handleOpenBuyerModal
-  );
-
-  return () => {
-    window.removeEventListener(
-      "openAddBuyerModal",
-      handleOpenBuyerModal
-    );
-  };
-}, []);
+      // Clear transient route state so the modal does not reopen unintentionally.
+      navigate(location.pathname, {
+        replace: true,
+        state: {},
+      });
+    }
+  }, [location.pathname, location.state, navigate]);
 
   const handleCreateBuyer = (buyerData) => {
     const newBuyer = {

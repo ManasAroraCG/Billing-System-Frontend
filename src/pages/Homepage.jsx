@@ -1,5 +1,6 @@
 import Navbar from '../components/Navbar';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 
@@ -7,6 +8,8 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 function Homepage() {
+  const navigate = useNavigate();
+
   const images = [
     {
       url: "https://media.istockphoto.com/id/1454303048/photo/modern-dark-luxury-minimalist-bathroom.jpg?b=1&s=612x612&w=0&k=20&c=38sT29Kkl7Er0wfslVyqPxLECRc3WjyF0_q_ZVdQGUU=",
@@ -670,7 +673,11 @@ function Homepage() {
               boxShadow: '0 8px 25px rgba(139, 105, 20, 0.3)',
               transition: 'all 0.3s ease'
             }}
-            onClick={() => window.location.href = '/add-buyer'}
+            onClick={() =>
+              navigate('/buyers', {
+                state: { openAddBuyer: true }
+              })
+            }
             onMouseEnter={(e) => {
               e.target.style.transform = 'translateY(-3px)';
               e.target.style.boxShadow = '0 12px 35px rgba(139, 105, 20, 0.4)';
