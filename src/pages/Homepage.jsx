@@ -10,6 +10,14 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 function Homepage() {
   const navigate = useNavigate();
 
+  // Authentication check on component mount
+  useEffect(() => {
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+      navigate('/login', { replace: true });
+    }
+  }, [navigate]);
+
   const images = [
     {
       url: "https://media.istockphoto.com/id/1454303048/photo/modern-dark-luxury-minimalist-bathroom.jpg?b=1&s=612x612&w=0&k=20&c=38sT29Kkl7Er0wfslVyqPxLECRc3WjyF0_q_ZVdQGUU=",
