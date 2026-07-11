@@ -53,7 +53,7 @@ export default function NewBuyerModal({
   return (
     <div className="modal-overlay">
 
-      <div className="modal-card">
+      <div className="modal-card compact-modal-card">
 
         <div className="modal-header">
 

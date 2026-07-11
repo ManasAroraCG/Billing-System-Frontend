@@ -11,7 +11,7 @@
 .modify-prices-container {
   max-width: 1500px;
   margin: 0 auto;
-  padding: 72px 24px 24px;
+  padding: 96px 24px 24px;
 
 }
 
@@ -31,6 +31,8 @@
   font-size: 30px;
   font-weight: 600;
   color: #2b1b13;
+  font-family: "Playfair Display", serif;
+  line-height: 1.15;
 }
 
 .pricing-header p {
@@ -55,6 +57,7 @@
   color: #7b6d60;
   font-size: 13px;
   font-weight: 500;
+  font-family: "Inter", sans-serif;
 
   transition: all 0.2s ease;
 }
@@ -79,6 +82,7 @@
 
   cursor: pointer;
   font-weight: 600;
+  font-family: "Inter", sans-serif;
 
   transition: all 0.25s ease;
 }
@@ -266,6 +270,10 @@
   .pricing-header {
     flex-direction: column;
     gap: 16px;
+  }
+
+  .pricing-header h1 {
+    font-size: 26px;
   }
 }
 
