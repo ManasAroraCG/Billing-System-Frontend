@@ -13,50 +13,16 @@ import BuyerInsightsModal from "../components/BuyerInsightsModal";
 
 import { FiDownload, FiPlus } from "react-icons/fi";
 import Navbar from "../components/Navbar";
-
+import { API_BASE_URL } from "../services/api";
+import getAuthToken from "../utils/auth";
 export default function Buyers() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [buyers, setBuyers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const [buyers, setBuyers] = useState([
-    {
-      id: 1,
-      initials: "AA",
-      name: "Apex Architecture Hub",
-      location: "Kolkata, WB",
-      gst: "19AAAAA0000A1Z5",
-      phone: "+91 98765 43210",
-      email: "contact@apexarch.com",
-      revenue: "₹4,520,000",
-      pending: "₹0",
-      status: "SETTLED",
-    },
-    {
-      id: 2,
-      initials: "BC",
-      name: "Blue Chip Sanitaryware",
-      location: "Ahmedabad, GJ",
-      gst: "24BBBB1111B2Z6",
-      phone: "+91 70001 00001",
-      email: "ops@bluechip.in",
-      revenue: "₹12,800,000",
-      pending: "₹1,420,000",
-      status: "15 DAYS OVERDUE",
-    },
-    {
-      id: 3,
-      initials: "DW",
-      name: "Dream World Projects",
-      location: "Mumbai, MH",
-      gst: "27CCCCC2222C3Z7",
-      phone: "+91 99999 88888",
-      email: "billing@dreamworld.com",
-      revenue: "₹3,210,000",
-      pending: "₹450,000",
-      status: "PENDING APPROVAL",
-    },
-  ]);
-
+  const [dashboardSummary, setDashboardSummary] = useState(null);
   const [selectedBuyer, setSelectedBuyer] = useState(null);
 
   const [editingBuyer, setEditingBuyer] = useState(null);
@@ -74,6 +40,134 @@ export default function Buyers() {
   const [showInsightsModal, setShowInsightsModal] = useState(false);
 
   useEffect(() => {
+    fetchCustomers();
+    fetchDashboardSummary();
+  }, []);
+
+  const fetchCustomers = async () => {
+    try {
+      setLoading(true);
+
+      const token = getAuthToken();
+
+      const [customersResponse, salesResponse, invoicesResponse] =
+        await Promise.all([
+          fetch(`${API_BASE_URL}/Customers`, {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }),
+
+          fetch(`${API_BASE_URL}/Reports/customer-sales`, {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }),
+
+          fetch(`${API_BASE_URL}/Invoices`, {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }),
+        ]);
+
+      const customersResult = await customersResponse.json();
+
+      const salesResult = await salesResponse.json();
+
+      const invoicesResult = await invoicesResponse.json();
+
+      const salesData = salesResult.success ? salesResult.data : [];
+
+      const invoiceData = invoicesResult.success
+        ? invoicesResult.data?.data || []
+        : [];
+
+      const mappedCustomers = customersResult.data.map((customer) => {
+        const salesInfo = salesData.find(
+          (sale) => sale.customerId === customer.id,
+        );
+
+        const pendingAmount = invoiceData
+          .filter(
+            (invoice) =>
+              invoice.partyName === customer.partyName &&
+              invoice.status === "pending",
+          )
+          .reduce((sum, invoice) => sum + Number(invoice.grandTotal || 0), 0);
+
+        return {
+          id: customer.id,
+
+          initials: customer.partyName
+            .split(" ")
+            .slice(0, 2)
+            .map((word) => word[0])
+            .join("")
+            .toUpperCase(),
+
+          name: customer.partyName,
+
+          location: customer.billingAddress || "",
+
+          gst: customer.gstin || "",
+
+          phone: customer.phone || "",
+
+          email: customer.email || "",
+
+          revenue: `₹${(salesInfo?.totalSales || 0).toLocaleString()}`,
+
+          pending: `₹${pendingAmount.toLocaleString()}`,
+
+          status: customer.isActive ? "ACTIVE" : "INACTIVE",
+
+          contactPerson: customer.contactPerson || "",
+
+          panNumber: customer.panNumber || "",
+
+          billingAddress: customer.billingAddress || "",
+
+          shippingAddress: customer.shippingAddress || "",
+        };
+      });
+
+      setBuyers(mappedCustomers);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchDashboardSummary = async () => {
+    try {
+      const token = getAuthToken();
+
+      const response = await fetch(`${API_BASE_URL}/Dashboard/summary`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setDashboardSummary(result.data);
+      }
+    } catch (error) {
+      console.error("Failed to load dashboard summary", error);
+    }
+  };
+
+  useEffect(() => {
     if (location.state?.openAddBuyer) {
       setShowNewBuyerModal(true);
 
@@ -85,24 +179,118 @@ export default function Buyers() {
     }
   }, [location.pathname, location.state, navigate]);
 
-  const handleCreateBuyer = (buyerData) => {
-    const newBuyer = {
-      ...buyerData,
-      id: 1 + Math.max(0, ...buyers.map((b) => b.id)),
-      initials: buyerData.name
-        .split(" ")
-        .slice(0, 2)
-        .map((w) => w[0])
-        .join("")
-        .toUpperCase(),
-      revenue: "₹0",
-      pending: "₹0",
-      status: "NEW",
-    };
+  const handleCreateBuyer = async (buyerData) => {
+    try {
+      const token = getAuthToken();
 
-    setBuyers((prev) => [...prev, newBuyer]);
-    setShowNewBuyerModal(false);
+      const response = await fetch(`${API_BASE_URL}/Customers`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          partyName: buyerData.name,
+          contactPerson: buyerData.contactPerson,
+
+          phone: buyerData.phone,
+
+          email: buyerData.email,
+
+          billingAddress: buyerData.billingAddress,
+
+          shippingAddress: buyerData.shippingAddress,
+
+          gstin: buyerData.gst,
+
+          panNumber: buyerData.panNumber,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setShowNewBuyerModal(false);
+
+        await fetchCustomers();
+
+        alert("Buyer created successfully");
+      } else {
+        alert(result.message || "Failed to create buyer");
+      }
+    } catch (error) {
+      console.error("Create buyer failed:", error);
+
+      alert("Failed to create buyer");
+    }
   };
+
+  const handleExportCSV = () => {
+    const headers = [
+      "Buyer Name",
+      "Contact Person",
+      "GST Number",
+      "PAN Number",
+      "Phone",
+      "Email",
+      "Revenue",
+      "Pending Amount",
+      "Billing Address",
+      "Shipping Address",
+      "Status",
+    ];
+
+    const rows = buyers.map((buyer) => [
+      buyer.name,
+      buyer.contactPerson,
+      buyer.gst,
+      buyer.panNumber,
+      buyer.phone,
+      buyer.email,
+      buyer.revenue,
+      buyer.pending,
+      buyer.billingAddress,
+      buyer.shippingAddress,
+      buyer.status,
+    ]);
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map((row) =>
+        row
+          .map((value) => `"${String(value || "").replace(/"/g, '""')}"`)
+          .join(","),
+      ),
+    ].join("\n");
+
+    const blob = new Blob([csvContent], {
+      type: "text/csv;charset=utf-8;",
+    });
+
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+
+    link.href = url;
+
+    link.download = `buyers_${new Date().toISOString().split("T")[0]}.csv`;
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    document.body.removeChild(link);
+
+    window.URL.revokeObjectURL(url);
+  };
+  if (loading) {
+    return (
+      <div className="buyers-page">
+        <Navbar />
+        <p style={{ padding: "100px 20px" }}>Loading buyers...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="buyers-page">
@@ -117,8 +305,13 @@ export default function Buyers() {
         </div>
 
         <div className="buyers-actions">
-          <button className="btn btn-secondary">
-            <FiDownload style={{ paddingTop: "6px", paddingRight: "4px" }} />
+          <button className="btn btn-secondary" onClick={handleExportCSV}>
+            <FiDownload
+              style={{
+                paddingTop: "6px",
+                paddingRight: "4px",
+              }}
+            />
             Export CSV
           </button>
 
@@ -137,35 +330,37 @@ export default function Buyers() {
         <div className="kpi-card">
           <div className="kpi-label">Total Buyers</div>
 
-          <h2>{buyers.length}</h2>
+          <h2>{dashboardSummary?.totalCustomers ?? buyers.length}</h2>
 
           <p>Active Customer Base</p>
         </div>
 
         <div className="kpi-card">
-          <div className="kpi-label">Avg. Order Value</div>
+          <div className="kpi-label">Month Sales</div>
 
-          <h2>₹42.5K</h2>
+          <h2>₹{(dashboardSummary?.monthSales || 0).toLocaleString()}</h2>
 
-          <p>Last 90 Days</p>
+          <p>Today: ₹{(dashboardSummary?.todaySales || 0).toLocaleString()}</p>
         </div>
 
         <div className="kpi-card">
           <div className="kpi-label">Pending Receivables</div>
 
-          <h2 className="danger">₹14.8M</h2>
+          <h2 className="danger">
+            ₹{(dashboardSummary?.totalPendingAmount || 0).toLocaleString()}
+          </h2>
 
-          <p className="danger">4 Overdue Invoices</p>
+          <p className="danger">
+            {dashboardSummary?.pendingCount || 0} Pending Invoices
+          </p>
         </div>
 
         <div className="kpi-card">
-          <div className="kpi-label">Retention Rate</div>
+          <div className="kpi-label">Products</div>
 
-          <h2>94.2%</h2>
+          <h2>{dashboardSummary?.totalProducts || 0}</h2>
 
-          <div className="progress">
-            <div className="progress-fill"></div>
-          </div>
+          <p>{dashboardSummary?.paidCount || 0} Paid Invoices</p>
         </div>
       </div>
 
@@ -175,6 +370,7 @@ export default function Buyers() {
             buyers={buyers}
             onView={setSelectedBuyer}
             onEdit={(buyer) => {
+              console.log("Editing buyer:", buyer);
               setSelectedBuyer(null);
               setEditingBuyer(buyer);
               setShowEditModal(true);
@@ -190,23 +386,17 @@ export default function Buyers() {
           <div className="drawer-overlay">
             <BuyerSidePanel
               buyer={selectedBuyer}
-
-                // setPricingBuyer(selectedBuyer);
-                // setSelectedBuyer(null);
-                // setShowPricingModal(true);
-                onModifyPrices={() => {
-                  navigate(
-                    `/modify-prices/${selectedBuyer.id}`,
-                    {
-
-                      state: { buyer: selectedBuyer }
-                    }
-                  );
-                }}
-              
+              // setPricingBuyer(selectedBuyer);
+              // setSelectedBuyer(null);
+              // setShowPricingModal(true);
+              onModifyPrices={() => {
+                navigate(`/modify-prices/${selectedBuyer.id}`, {
+                  state: { buyer: selectedBuyer },
+                });
+              }}
               onCreateOrder={() =>
                 navigate(`/create-order/${selectedBuyer.id}`, {
-                  state: { buyer: selectedBuyer }
+                  state: { buyer: selectedBuyer },
                 })
               }
               onClose={() => setSelectedBuyer(null)}
@@ -226,9 +416,10 @@ export default function Buyers() {
       <EditBuyerModal
         open={showEditModal}
         buyer={editingBuyer}
+        fetchCustomers={fetchCustomers}
         onClose={() => {
-          setEditingBuyer(null);
           setShowEditModal(false);
+          setEditingBuyer(null);
         }}
       />
 

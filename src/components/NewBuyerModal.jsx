@@ -1,28 +1,28 @@
 import { useState, useEffect } from "react";
 
-export default function NewBuyerModal({
-  open,
-  onClose,
-  onCreate,
-}) {
-  const [formData, setFormData] = useState({
-    name: "",
-    location: "",
-    gst: "",
-    phone: "",
-    email: "",
-    address: "",
-  });
+export default function NewBuyerModal({ open, onClose, onCreate }) {
+const [formData, setFormData] = useState({
+  name: "",
+  contactPerson: "",
+  gst: "",
+  panNumber: "",
+  phone: "",
+  email: "",
+  billingAddress: "",
+  shippingAddress: "",
+});
 
   useEffect(() => {
     if (open) {
       setFormData({
         name: "",
-        location: "",
+        contactPerson: "",
         gst: "",
+        panNumber: "",
         phone: "",
         email: "",
-        address: "",
+        billingAddress: "",
+        shippingAddress: "",
       });
     }
   }, [open]);
@@ -52,24 +52,16 @@ export default function NewBuyerModal({
 
   return (
     <div className="modal-overlay">
-
       <div className="modal-card compact-modal-card">
-
         <div className="modal-header">
-
           <h3>Create Buyer</h3>
 
-          <button
-            className="modal-close"
-            onClick={onClose}
-          >
+          <button className="modal-close" onClick={onClose}>
             ×
           </button>
-
         </div>
 
         <div className="modal-body">
-
           <div className="form-group">
             <label>Buyer Name *</label>
 
@@ -81,16 +73,26 @@ export default function NewBuyerModal({
               placeholder="Apex Architecture Hub"
             />
           </div>
-
           <div className="form-group">
-            <label>Location</label>
+                <label>Contact Person</label>
+                <input
+              type="text"
+              name="contactPerson"
+              value={formData.contactPerson}
+              onChange={handleChange}
+              placeholder="John Doe"
+            />
+          </div>
+          {/* Pan number */}
+          <div className="form-group">
+            <label>PAN Number</label>
 
             <input
               type="text"
-              name="location"
-              value={formData.location}
+              name="panNumber"
+              value={formData.panNumber}
               onChange={handleChange}
-              placeholder="Delhi, NCR"
+              placeholder="AAAAA0000A"
             />
           </div>
 
@@ -131,39 +133,38 @@ export default function NewBuyerModal({
           </div>
 
           <div className="form-group">
-            <label>Address</label>
+            <label>Billing Address</label>
 
             <textarea
-              rows="4"
-              name="address"
-              value={formData.address}
+              rows="3"
+              name="billingAddress"
+              value={formData.billingAddress}
               onChange={handleChange}
-              placeholder="Complete Buyer Address"
             />
           </div>
 
+          <div className="form-group">
+            <label>Shipping Address</label>
+
+            <textarea
+              rows="3"
+              name="shippingAddress"
+              value={formData.shippingAddress}
+              onChange={handleChange}
+            />
+          </div>
         </div>
 
         <div className="modal-actions">
-
-          <button
-            className="btn btn-secondary"
-            onClick={onClose}
-          >
+          <button className="btn btn-secondary" onClick={onClose}>
             Cancel
           </button>
 
-          <button
-            className="btn btn-primary"
-            onClick={handleSubmit}
-          >
+          <button className="btn btn-primary" onClick={handleSubmit}>
             Create Buyer
           </button>
-
         </div>
-
       </div>
-
     </div>
   );
 }

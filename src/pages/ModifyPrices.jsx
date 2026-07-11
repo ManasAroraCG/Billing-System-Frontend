@@ -1,68 +1,70 @@
-import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import Navbar from "../components/Navbar";
 import "../styles/modifyPrices.css";
 
-import {
-  FiArrowLeft,
-  FiSave,
-  FiSearch,
-} from "react-icons/fi";
+import { FiArrowLeft, FiSave, FiSearch } from "react-icons/fi";
+
+import { API_BASE_URL } from "../services/api";
+import getAuthToken from "../utils/auth";
 
 export default function ModifyPrices() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { buyerId } = useParams();
 
   const buyer = location.state?.buyer || {
-    id: 1,
+    id: buyerId,
     name: "Unknown Buyer",
   };
 
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  const [products, setProducts] = useState([
-    {
-      id: 1,
-      sku: "AQ-1001",
-      name: "Premium Basin Mixer",
-      category: "Bathroom",
-      defaultPrice: 4500,
-      buyerPrice: 4200,
-    },
-    {
-      id: 2,
-      sku: "AQ-1002",
-      name: "Luxury Kitchen Faucet",
-      category: "Kitchen",
-      defaultPrice: 6200,
-      buyerPrice: 5800,
-    },
-    {
-      id: 3,
-      sku: "AQ-1003",
-      name: "Rain Shower Set",
-      category: "Shower",
-      defaultPrice: 12500,
-      buyerPrice: 11800,
-    },
-    {
-      id: 4,
-      sku: "AQ-1004",
-      name: "Premium Wash Basin",
-      category: "Sanitaryware",
-      defaultPrice: 8500,
-      buyerPrice: 8200,
-    },
-    {
-      id: 5,
-      sku: "AQ-1005",
-      name: "Designer Mirror",
-      category: "Accessories",
-      defaultPrice: 3200,
-      buyerPrice: 3000,
-    },
-  ]);
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    fetchPricing();
+  }, [buyerId]);
+
+  const fetchPricing = async () => {
+    try {
+      setLoading(true);
+
+      const token = getAuthToken();
+
+      const response = await fetch(
+        `${API_BASE_URL}/Customers/${buyerId}/pricing/bill-ready`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      const result = await response.json();
+
+      if (result.success) {
+        const mappedProducts = result.data.map((item) => ({
+          id: item.productId,
+          sku: item.modelNumber,
+          name: item.productName,
+          category: item.categoryName || "Uncategorized",
+          stock: item.stock,
+          buyerPrice: item.effectivePrice,
+          hasCustomPrice: item.hasCustomPrice,
+        }));
+
+        setProducts(mappedProducts);
+      }
+    } catch (error) {
+      console.error("Failed to load pricing", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const updatePrice = (id, value) => {
     setProducts((prev) =>
@@ -72,45 +74,87 @@ export default function ModifyPrices() {
               ...product,
               buyerPrice: value,
             }
-          : product
-      )
+          : product,
+      ),
     );
   };
 
   const filteredProducts = products.filter(
     (product) =>
-      product.name
-        .toLowerCase()
-        .includes(search.toLowerCase()) ||
-      product.sku
-        .toLowerCase()
-        .includes(search.toLowerCase())
+      product.name.toLowerCase().includes(search.toLowerCase()) ||
+      product.sku.toString().includes(search),
   );
 
-  const handleSave = () => {
-    console.log("Saving prices:", products);
+  const handleSave = async () => {
+    try {
+      const token = getAuthToken();
 
-    alert(
-      `Pricing updated successfully for ${buyer.name}`
-    );
+      for (const product of products) {
+        const endpoint = product.hasCustomPrice
+          ? `${API_BASE_URL}/Customers/${buyerId}/pricing/${product.id}`
+          : `${API_BASE_URL}/Customers/${buyerId}/pricing`;
+
+        const method = product.hasCustomPrice ? "PUT" : "POST";
+
+        const body = product.hasCustomPrice
+          ? {
+              negotiatedPrice: product.buyerPrice,
+            }
+          : {
+              productId: product.id,
+              negotiatedPrice: product.buyerPrice,
+            };
+
+        const response = await fetch(endpoint, {
+          method,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+          throw new Error(result.message || "Failed to update pricing");
+        }
+      }
+
+      await fetchPricing();
+
+      alert(`Pricing updated successfully for ${buyer.name}`);
+    } catch (error) {
+      console.error("Pricing update failed:", error);
+
+      alert("Failed to update pricing");
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="modify-prices-page">
+        <Navbar />
+
+        <div
+          style={{
+            padding: "100px 24px",
+          }}
+        >
+          Loading pricing...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="modify-prices-page">
       <Navbar />
 
       <div className="modify-prices-container">
-
-        {/* Header */}
-
         <div className="pricing-header">
-
           <div>
-
-            <button
-              className="back-btn"
-              onClick={() => navigate("/buyers")}
-            >
+            <button className="back-btn" onClick={() => navigate("/buyers")}>
               <FiArrowLeft />
               Back to Buyers
             </button>
@@ -121,135 +165,86 @@ export default function ModifyPrices() {
               Configure custom pricing for
               <strong> {buyer.name}</strong>
             </p>
-
           </div>
 
-          <button
-            className="save-btn"
-            onClick={handleSave}
-          >
+          <button className="save-btn" onClick={handleSave}>
             <FiSave />
             Save Changes
           </button>
-
         </div>
 
-        {/* Buyer Summary */}
-
         <div className="buyer-summary-card">
-
           <div className="summary-item">
             <span>Buyer Name</span>
+
             <strong>{buyer.name}</strong>
           </div>
 
           <div className="summary-item">
             <span>Products</span>
-            <strong>
-              {filteredProducts.length}
-            </strong>
+
+            <strong>{filteredProducts.length}</strong>
           </div>
 
           <div className="summary-item">
             <span>Pricing Type</span>
-            <strong>Custom Pricing</strong>
-          </div>
 
+            <strong>Negotiated Pricing</strong>
+          </div>
         </div>
 
-        {/* Search */}
-
         <div className="search-box">
-
           <FiSearch />
 
           <input
             type="text"
             placeholder="Search products..."
             value={search}
-            onChange={(e) =>
-              setSearch(e.target.value)
-            }
+            onChange={(e) => setSearch(e.target.value)}
           />
-
         </div>
 
-        {/* Table */}
-
         <div className="catalog-card">
-
           <table className="catalog-pricing-table">
-
             <thead>
               <tr>
-                <th>SKU</th>
+                <th>MODEL</th>
                 <th>PRODUCT</th>
                 <th>CATEGORY</th>
-                <th>DEFAULT PRICE</th>
+                <th>STOCK</th>
                 <th>BUYER PRICE</th>
-                <th>DISCOUNT</th>
+                <th>CUSTOM</th>
               </tr>
             </thead>
 
             <tbody>
+              {filteredProducts.map((product) => (
+                <tr key={product.id}>
+                  <td>{product.sku}</td>
 
-              {filteredProducts.map((product) => {
+                  <td>{product.name}</td>
 
-                const discount =
-                  product.defaultPrice -
-                  product.buyerPrice;
+                  <td>{product.category}</td>
 
-                return (
-                  <tr key={product.id}>
+                  <td>{product.stock}</td>
 
-                    <td>{product.sku}</td>
-
-                    <td>{product.name}</td>
-
-                    <td>{product.category}</td>
-
-                    <td>
-                      ₹
-                      {product.defaultPrice.toLocaleString()}
-                    </td>
-
-                    <td>
-
-                      <input
-                        className="price-input"
-                        type="number"
-                        value={product.buyerPrice}
-                        onChange={(e) =>
-                          updatePrice(
-                            product.id,
-                            Number(e.target.value)
-                          )
-                        }
-                      />
-
-                    </td>
-
-                    <td
-                      className={
-                        discount > 0
-                          ? "discount-value"
-                          : ""
+                  <td>
+                    <input
+                      className="price-input"
+                      type="number"
+                      value={product.buyerPrice}
+                      onChange={(e) =>
+                        updatePrice(product.id, Number(e.target.value))
                       }
-                    >
-                      ₹
-                      {discount.toLocaleString()}
-                    </td>
+                    />
+                  </td>
 
-                  </tr>
-                );
-              })}
-
+                  <td>{product.hasCustomPrice ? "Yes" : "No"}</td>
+                </tr>
+              ))}
             </tbody>
-
           </table>
-
         </div>
-
       </div>
     </div>
   );
