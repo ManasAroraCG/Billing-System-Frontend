@@ -7,8 +7,8 @@ function Navbar() {
   const [onDarkSection, setOnDarkSection] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // List of routes with white background
-  const whiteBgRoutes = ['/catalog', '/invoices', '/buyers', '/add-buyer', '/create-order'];
+  // List of routes with white background - ADDED /cart and /generate-bill
+  const whiteBgRoutes = ['/catalog', '/invoices', '/buyers', '/add-buyer', '/create-order', '/cart', '/generate-bill'];
 
   useEffect(() => {
     const handleScroll = () => {

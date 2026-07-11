@@ -698,7 +698,11 @@ function Homepage() {
               textTransform: 'uppercase',
               transition: 'all 0.3s ease'
             }}
-            onClick={() => window.location.href = '/create-order'}
+            // Update the Create Order button onClick:
+            onClick={() => {
+              sessionStorage.setItem('orderCart', JSON.stringify({}));
+              window.location.href = '/create-order';
+            }}
             onMouseEnter={(e) => {
               e.target.style.background = 'linear-gradient(135deg, #8B6914 0%, #A0522D 100%)';
               e.target.style.color = 'white';
