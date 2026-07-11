@@ -18,6 +18,7 @@ function Navbar() {
     "/cart",
     "/generate-bill",
     "/modify-prices",
+    "/invoice",
   ];
 
   const isWhitePage = whiteBgRoutes.some((route) =>
@@ -104,7 +105,7 @@ function Navbar() {
     ? scrolled
       ? "rgba(0,0,0,0.40)"
       : "transparent"
-    : "rgba(247,245,241,0.96)";
+    : "rgba(255,255,255,0.96)";
 
   const borderColor = onDarkSection
     ? scrolled
@@ -144,8 +145,6 @@ function Navbar() {
     });
   };
 
-  
-
   return (
     <>
       <nav
@@ -168,7 +167,6 @@ function Navbar() {
         }}
       >
         {/* Logo */}
-
         <Link
           to="/"
           style={{
@@ -190,32 +188,28 @@ function Navbar() {
               stroke={logoColor}
               strokeWidth="1.5"
             />
-
             <path
               d="M9 22V12H15V22"
               stroke={logoColor}
               strokeWidth="1.5"
             />
           </svg>
-
           <span
             style={{
               color: logoColor,
-              fontFamily:
-                "'Playfair Display', serif",
-              fontSize: scrolled
-                ? "16px"
-                : "18px",
+              fontFamily: "'Playfair Display', serif",
+              fontSize: scrolled ? "16px" : "18px",
               fontWeight: 700,
               letterSpacing: "1px",
+              transition: "font-size 0.3s ease, color 0.3s ease",
+              whiteSpace: "nowrap"
             }}
           >
             AQUA
           </span>
         </Link>
 
-        {/* Center Nav */}
-
+        {/* Center Nav - Desktop */}
         <div
           className="desktop-nav-center"
           style={{
@@ -224,94 +218,326 @@ function Navbar() {
             gap: "32px",
             position: "absolute",
             left: "50%",
-            transform:
-              "translateX(-50%)",
+            transform: "translateX(-50%)",
           }}
         >
-          {mainNavLinks.map(
-            ({ path, label }) => (
-              <Link
-                key={path}
-                to={path}
-                style={{
-                  color: textColor,
-                  textDecoration: "none",
-                  fontSize: "13px",
-                  fontWeight: isActive(path)
-                    ? 600
-                    : 400,
-                  padding: "6px 12px",
-                  borderRadius: "6px",
-                  background: isActive(path)
-                    ? activeBg
-                    : "transparent",
-                }}
-              >
-                {label}
-              </Link>
-            )
-          )}
+          {mainNavLinks.map(({ path, label }) => (
+            <Link
+              key={path}
+              to={path}
+              style={{
+                color: textColor,
+                textDecoration: "none",
+                fontFamily: "'Inter', sans-serif",
+                fontSize: "13px",
+                fontWeight: isActive(path) ? 600 : 400,
+                padding: "6px 12px",
+                borderRadius: "6px",
+                background: isActive(path) ? activeBg : "transparent",
+                transition: "all 0.3s ease",
+                letterSpacing: "0.3px",
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.background = hoverBg;
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive(path)) {
+                  e.target.style.background = "transparent";
+                }
+              }}
+            >
+              {label}
+            </Link>
+          ))}
         </div>
 
+        {/* Right Nav - Desktop */}
+        <div
+          className="desktop-nav-right"
+          style={{
+            display: "flex",
+            gap: "12px",
+            flexShrink: 0
+          }}
+        >
+          <button
+            onClick={handleAddBuyerClick}
+            style={{
+              color: textColor,
+              textDecoration: "none",
+              fontFamily: "'Inter', sans-serif",
+              fontSize: "13px",
+              fontWeight: 400,
+              padding: "6px 12px",
+              borderRadius: "6px",
+              background: "transparent",
+              border: "none",
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              letterSpacing: "0.3px",
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.background = hoverBg;
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.background = "transparent";
+            }}
+          >
+            Add Buyer
+          </button>
+          <Link
+            to="/create-order"
+            style={{
+              color: textColor,
+              textDecoration: "none",
+              fontFamily: "'Inter', sans-serif",
+              fontSize: "13px",
+              fontWeight: isActive("/create-order") ? 600 : 400,
+              padding: "6px 12px",
+              borderRadius: "6px",
+              background: isActive("/create-order") ? activeBg : "transparent",
+              transition: "all 0.3s ease",
+              letterSpacing: "0.3px",
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.background = hoverBg;
+            }}
+            onMouseLeave={(e) => {
+              if (!isActive("/create-order")) {
+                e.target.style.background = "transparent";
+              }
+            }}
+          >
+            Create Order
+          </Link>
+        </div>
 
-        {/* Right Nav */}
-
-{/* Right Nav */}
-
-<div
-  className="desktop-nav-right"
-  style={{
-    display: "flex",
-    gap: "12px",
-  }}
->
-  {rightNavLinks.map(({ path, label }) => {
-    if (path === "/add-buyer") {
-      return (
+        {/* Mobile Hamburger Button */}
         <button
-          key={path}
-          onClick={handleAddBuyerClick}
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          style={{
+            display: "none",
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            padding: "8px",
+            zIndex: 1001
+          }}
+          className="hamburger-btn"
+          aria-label="Toggle menu"
+        >
+          <div style={{
+            width: "24px",
+            height: "2px",
+            background: logoColor,
+            margin: "5px 0",
+            transition: "all 0.3s ease",
+            transform: mobileMenuOpen ? "rotate(45deg) translate(5px, 5px)" : "none"
+          }} />
+          <div style={{
+            width: "24px",
+            height: "2px",
+            background: logoColor,
+            margin: "5px 0",
+            transition: "all 0.3s ease",
+            opacity: mobileMenuOpen ? 0 : 1
+          }} />
+          <div style={{
+            width: "24px",
+            height: "2px",
+            background: logoColor,
+            margin: "5px 0",
+            transition: "all 0.3s ease",
+            transform: mobileMenuOpen ? "rotate(-45deg) translate(5px, -5px)" : "none"
+          }} />
+        </button>
+      </nav>
+
+      {/* Mobile Menu Overlay */}
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: onDarkSection ? "rgba(0, 0, 0, 0.95)" : "rgba(255, 255, 255, 0.98)",
+          zIndex: 999,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "16px",
+          transform: mobileMenuOpen ? "translateX(0)" : "translateX(100%)",
+          transition: "transform 0.3s ease-in-out",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)"
+        }}
+        className="mobile-menu"
+      >
+        <div
+          style={{
+            color: textColor,
+            fontFamily: "'Inter', sans-serif",
+            fontSize: "14px",
+            fontWeight: 600,
+            letterSpacing: "2px",
+            textTransform: "uppercase",
+            opacity: 0.6,
+            marginBottom: "8px"
+          }}
+        >
+          Navigation
+        </div>
+
+        {mainNavLinks.map(({ path, label }) => (
+          <Link
+            key={path}
+            to={path}
+            style={{
+              color: textColor,
+              textDecoration: "none",
+              fontFamily: "'Inter', sans-serif",
+              fontSize: "18px",
+              fontWeight: isActive(path) ? 700 : 500,
+              padding: "12px 24px",
+              borderRadius: "8px",
+              background: isActive(path) ? activeBg : "transparent",
+              transition: "all 0.3s ease",
+              letterSpacing: "0.5px",
+              width: "220px",
+              textAlign: "center"
+            }}
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            {label}
+          </Link>
+        ))}
+
+        <div
+          style={{
+            width: "80px",
+            height: "1px",
+            background: logoColor,
+            opacity: 0.3,
+            margin: "8px 0"
+          }}
+        />
+
+        <div
+          style={{
+            color: textColor,
+            fontFamily: "'Inter', sans-serif",
+            fontSize: "14px",
+            fontWeight: 600,
+            letterSpacing: "2px",
+            textTransform: "uppercase",
+            opacity: 0.6,
+            marginBottom: "8px"
+          }}
+        >
+          Actions
+        </div>
+
+        <button
+          onClick={() => {
+            handleAddBuyerClick();
+            setMobileMenuOpen(false);
+          }}
           style={{
             color: textColor,
             textDecoration: "none",
-            fontSize: "13px",
-            fontWeight: 400,
-            padding: "6px 12px",
-            borderRadius: "6px",
+            fontFamily: "'Inter', sans-serif",
+            fontSize: "18px",
+            fontWeight: 500,
+            padding: "12px 24px",
+            borderRadius: "8px",
             background: "transparent",
             border: "none",
             cursor: "pointer",
+            transition: "all 0.3s ease",
+            letterSpacing: "0.5px",
+            width: "220px",
+            textAlign: "center"
           }}
         >
-          {label}
+          Add Buyer
         </button>
-      );
-    }
+        <Link
+          to="/create-order"
+          style={{
+            color: textColor,
+            textDecoration: "none",
+            fontFamily: "'Inter', sans-serif",
+            fontSize: "18px",
+            fontWeight: isActive("/create-order") ? 700 : 500,
+            padding: "12px 24px",
+            borderRadius: "8px",
+            background: isActive("/create-order") ? activeBg : "transparent",
+            transition: "all 0.3s ease",
+            letterSpacing: "0.5px",
+            width: "220px",
+            textAlign: "center"
+          }}
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          Create Order
+        </Link>
+      </div>
 
-    return (
-      <Link
-        key={path}
-        to={path}
-        style={{
-          color: textColor,
-          textDecoration: "none",
-          fontSize: "13px",
-          fontWeight: isActive(path)
-            ? 600
-            : 400,
-          padding: "6px 12px",
-          borderRadius: "6px",
-          background: isActive(path)
-            ? activeBg
-            : "transparent",
-        }}
-      >
-        {label}
-      </Link>
-    );
-  })}
-</div>
-      </nav>
+      <style>{`
+        @media (max-width: 768px) {
+          .desktop-nav-center,
+          .desktop-nav-right {
+            display: none !important;
+          }
+          .hamburger-btn {
+            display: block !important;
+          }
+          nav {
+            padding: 0 12px !important;
+          }
+        }
+        
+        @media (min-width: 769px) {
+          .hamburger-btn {
+            display: none !important;
+          }
+          .mobile-menu {
+            display: none !important;
+          }
+          .desktop-nav-center {
+            display: flex !important;
+          }
+          .desktop-nav-right {
+            display: flex !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .mobile-menu a,
+          .mobile-menu button {
+            font-size: 16px !important;
+            padding: 10px 16px !important;
+            width: 200px !important;
+          }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+          .desktop-nav-center {
+            gap: 24px !important;
+          }
+          .desktop-nav-right {
+            gap: 8px !important;
+          }
+          .desktop-nav-center a,
+          .desktop-nav-right a,
+          .desktop-nav-right button {
+            font-size: 12px !important;
+            padding: 5px 8px !important;
+          }
+        }
+      `}</style>
     </>
   );
 }
