@@ -75,7 +75,7 @@ function Cart() {
               fontWeight: 600,
               margin: '0 0 4px 0'
             }}>
-              Shopping Cart
+              Create Order
             </h2>
             <span style={{
               fontFamily: "'Inter', sans-serif",
@@ -160,7 +160,7 @@ function Cart() {
                 display: 'inline-block'
               }}
             >
-              Continue Shopping
+              Continue
             </a>
           </div>
         ) : (
@@ -481,7 +481,7 @@ function Cart() {
                 Generate Bill
               </button>
 
-              {/* Continue Shopping */}
+              {/* Continue */}
               <a
                 href="/create-order"
                 style={{
