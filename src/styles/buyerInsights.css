@@ -1,0 +1,162 @@
+.insights-modal {
+  width: 900px;
+  max-width: 95vw;
+
+  background: #fff;
+
+  border-radius: 18px;
+  border: 1px solid #e7dfd2;
+
+  padding: 24px;
+
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.insights-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+
+  margin-bottom: 20px;
+}
+
+.insight-summary-card {
+  background: #faf8f4;
+
+  border: 1px solid #e7dfd2;
+  border-radius: 14px;
+
+  padding: 18px;
+
+  text-align: left;
+}
+
+.insight-summary-card span {
+  display: block;
+
+  color: #7b6d60;
+  font-size: 13px;
+  font-weight: 500;
+
+  margin-bottom: 8px;
+}
+
+.insight-summary-card h2 {
+  margin: 0;
+
+  font-size: 28px;
+  font-weight: 700;
+
+  color: #957418;
+  line-height: 1.2;
+}
+
+.insight-summary-card h3 {
+  margin: 0;
+
+  color: #2b1b13;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.recent-orders-section {
+  margin-top: 10px;
+}
+
+.recent-orders-section h4 {
+  margin: 0 0 14px 0;
+
+  color: #2b1b13;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.insights-table-wrapper {
+  overflow-x: auto;
+}
+
+.insights-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.insights-table thead {
+  background: #f5f2ec;
+}
+
+.insights-table th {
+  text-align: left;
+
+  padding: 14px;
+
+  color: #7b6d60;
+  font-size: 12px;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+.insights-table td {
+  padding: 14px;
+  border-top: 1px solid #ece7df;
+
+  color: #2b1b13;
+  font-size: 14px;
+}
+
+.insights-table tbody tr:hover {
+  background: #faf8f4;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+
+  margin-top: 20px;
+}
+
+.modal-actions button {
+  min-width: 120px;
+}
+
+@media (max-width: 768px) {
+
+  .insights-modal {
+    width: calc(100vw - 20px);
+    padding: 16px;
+  }
+
+  .insights-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .insight-summary-card {
+    padding: 14px;
+  }
+
+  .insight-summary-card h2 {
+    font-size: 24px;
+  }
+
+  .insight-summary-card h3 {
+    font-size: 16px;
+  }
+
+  .recent-orders-section h4 {
+    font-size: 18px;
+  }
+
+  .insights-table {
+    min-width: 550px;
+  }
+
+  .modal-actions {
+    justify-content: stretch;
+  }
+
+  .modal-actions button {
+    width: 100%;
+  }
+}
