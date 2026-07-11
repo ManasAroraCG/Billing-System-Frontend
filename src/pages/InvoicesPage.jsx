@@ -114,9 +114,11 @@ function Invoices() {
       filtered = filtered.filter((t) => t.date.slice(0, 10) === selectedDate);
     }
 
-    if (invoiceNumber && invoiceNumber.length === 6) {
-      const searchNumber = `INV-${invoiceNumber}`;
-      filtered = filtered.filter((t) => t.invoiceId === searchNumber);
+    if (invoiceNumber) {
+      const q = invoiceNumber.toLowerCase();
+      filtered = filtered.filter((t) =>
+        t.invoiceId.toLowerCase().includes(q)
+      );
     }
 
     setFilteredTransactions(filtered);
@@ -559,12 +561,8 @@ function Invoices() {
             <input
               type="text"
               value={invoiceNumber}
-              onChange={(e) => {
-                const value = e.target.value.replace(/\D/g, '').slice(0, 6);
-                setInvoiceNumber(value);
-              }}
-              placeholder="Enter 6-digit number"
-              maxLength={6}
+              onChange={(e) => setInvoiceNumber(e.target.value)}
+              placeholder="Search invoice number"
               style={{
                 width: '100%',
                 padding: '10px 14px',
