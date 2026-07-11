@@ -67,22 +67,25 @@ function LoginPage() {
       <div className="login-card">
         {/* Left Side */}
         <div className="login-left">
-          <div className="logo-row">
-            <Droplet size={40} />
-            <h1 className="logo-text">AQUA</h1>
-          </div>
+          <div className="login-left-bg"></div>
+          <div className="login-left-content">
+            <div className="logo-row">
+              <Droplet size={28} color="#e8d5b0" />
+              <h1 className="logo-text">AQUA</h1>
+            </div>
 
-          <h2 className="welcome-title">Welcome Back</h2>
+            <h2 className="welcome-title">Welcome Back</h2>
 
-          <p className="welcome-text">
-            Access your Aqua dashboard to manage catalogs,
-            invoices, customers, reports and orders from one place.
-          </p>
-
-          <div className="info-card">
-            <p>
-              Premium inventory and business management platform.
+            <p className="welcome-text">
+              Access your Aqua dashboard to manage catalogs,
+              invoices, customers, reports and orders from one place.
             </p>
+
+            <div className="info-card">
+              <p>
+                Premium inventory and business management platform.
+              </p>
+            </div>
           </div>
         </div>
 
@@ -141,8 +144,9 @@ function LoginPage() {
             {error && (
               <p
                 style={{
-                  color: "red",
+                  color: "#c0392b",
                   marginBottom: "12px",
+                  fontSize: "0.85rem",
                 }}
               >
                 {error}
