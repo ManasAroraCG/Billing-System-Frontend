@@ -344,7 +344,7 @@ function InvoiceDetail() {
             <path d="M3 17v3h3l11-11-3-3L3 17z"/>
             <path d="M16 2l3 3-3 3-3-3 3-3z"/>
           </svg>
-          <span className="btn-text">Digital Signature</span>
+          <span className="btn-text">Signature</span>
         </button>
         
         <button
@@ -373,7 +373,7 @@ function InvoiceDetail() {
             <line x1="16" y1="17" x2="8" y2="17"/>
             <polyline points="10 9 9 9 8 9"/>
           </svg>
-          <span className="btn-text">Download PDF</span>
+          <span className="btn-text">PDF</span>
         </button>
         
         <button
@@ -399,7 +399,7 @@ function InvoiceDetail() {
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
             <polyline points="14 2 14 8 20 8"/>
           </svg>
-          <span className="btn-text">Download DOC</span>
+          <span className="btn-text">DOC</span>
         </button>
         
         <button
