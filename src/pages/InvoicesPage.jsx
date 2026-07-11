@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
 import InvoiceTable from "../components/InvoiceTable";
 import TopFilters from "../components/TopFilters";
 import { fetchInvoices } from "../api/invoiceApi";
@@ -42,21 +43,26 @@ function InvoicesPage() {
   };
 
   return (
-    <div className="invoice-page">
-      <TopFilters
-        buyers={buyers}
-        filters={filters}
-        onBuyerChange={(value) => updateFilter("buyer", value)}
-        onDateChange={(value) => updateFilter("date", value)}
-        onSearchChange={(value) => updateFilter("invoiceNumber", value.replace(/\D/g, "").slice(0, 5))}
-      />
+    <>
+      <Navbar />
+      <div className="invoice-navbar-layout">
+        <div className="invoice-page">
+          <TopFilters
+            buyers={buyers}
+            filters={filters}
+            onBuyerChange={(value) => updateFilter("buyer", value)}
+            onDateChange={(value) => updateFilter("date", value)}
+            onSearchChange={(value) => updateFilter("invoiceNumber", value.replace(/\D/g, "").slice(0, 5))}
+          />
 
-      <InvoiceTable
-        invoices={invoices}
-        onPrint={handlePrint}
-        onDownloadPdf={handleDownloadPdf}
-      />
-    </div>
+          <InvoiceTable
+            invoices={invoices}
+            onPrint={handlePrint}
+            onDownloadPdf={handleDownloadPdf}
+          />
+        </div>
+      </div>
+    </>
   );
 }
 

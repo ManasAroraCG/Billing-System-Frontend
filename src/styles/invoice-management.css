@@ -541,6 +541,10 @@ select {
   padding: var(--space-lg);
 }
 
+.invoice-navbar-layout {
+  padding: 84px 24px 24px;
+}
+
 .invoice-page,
 .details-card {
   background: var(--surface-container-lowest);
@@ -887,6 +891,10 @@ tbody tr:hover {
 
   .page-content {
     padding: 12px;
+  }
+
+  .invoice-navbar-layout {
+    padding: 74px 12px 12px;
   }
 
   .invoice-page,
