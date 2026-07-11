@@ -6,6 +6,8 @@ import CreateOrder from "./pages/CreateOrder";
 import Cart from "./pages/Cart";
 import GenerateBill from "./pages/GenerateBill";
 import ModifyPrices from "./pages/ModifyPrices";
+import Invoices from "./pages/InvoicesPage";
+import InvoiceDetail from "./pages/InvoiceDetails";
 
 function App() {
   return (
@@ -18,6 +20,8 @@ function App() {
       <Route path="/cart" element={<Cart />} />
       <Route path="/generate-bill" element={<GenerateBill />} />
       <Route path="/modify-prices/:buyerId" element={<ModifyPrices />} />
+      <Route path="/invoices" element={<Invoices />} />
+      <Route path="/invoice/:invoiceId" element={<InvoiceDetail />} />
     </Routes>
   );
 }

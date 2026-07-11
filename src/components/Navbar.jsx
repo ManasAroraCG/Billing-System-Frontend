@@ -18,6 +18,7 @@ function Navbar() {
     "/cart",
     "/generate-bill",
     "/modify-prices",
+    "/invoice",
   ];
 
   const isWhitePage = whiteBgRoutes.some((route) =>
@@ -100,7 +101,6 @@ function Navbar() {
     ? "white"
     : "#8B6914";
 
-  // CHANGED: White background (#ffffff) instead of cream
   const navBackground = onDarkSection
     ? scrolled
       ? "rgba(0,0,0,0.40)"
