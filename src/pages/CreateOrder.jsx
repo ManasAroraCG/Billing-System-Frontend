@@ -714,6 +714,36 @@ function CreateOrder() {
             </div>
           </div>
 
+          {/* Mobile Category Swapper */}
+          <div className="mobile-category-swapper" style={{
+            gap: '8px',
+            marginBottom: '20px',
+            flexWrap: 'wrap'
+          }}>
+            {categories.map((cat) => (
+              <button
+                key={cat.id || cat.name || cat}
+                onClick={() => setSelectedCategory(cat.name || cat)}
+                style={{
+                  padding: '6px 14px',
+                  borderRadius: '20px',
+                  border: 'none',
+                  background: selectedCategory === (cat.name || cat) ? '#8B6914' : '#f0e6d8',
+                  color: selectedCategory === (cat.name || cat) ? 'white' : '#5C4033',
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: '12px',
+                  fontWeight: 500,
+                  whiteSpace: 'nowrap',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                {cat.name || cat}
+              </button>
+            ))}
+          </div>
+
           {/* Category Title */}
           <div style={{
             display: 'flex',
@@ -938,8 +968,17 @@ function CreateOrder() {
           scrollbar-color: #e5eeff transparent;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
           .sidebar {
+            display: none !important;
+          }
+          .mobile-category-swapper {
+            display: flex !important;
+            flex-wrap: wrap;
+          }
+        }
+        @media (min-width: 1025px) {
+          .mobile-category-swapper {
             display: none !important;
           }
         }
