@@ -1,7 +1,15 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 
 function CreateOrder() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = sessionStorage.getItem('token');
+    if (!token) navigate('/login', { replace: true });
+  }, [navigate]);
+
   const [showBuyerModal, setShowBuyerModal] = useState(true);
   const [selectedBuyer, setSelectedBuyer] = useState(null);
   const [showFlashOrder, setShowFlashOrder] = useState(false);

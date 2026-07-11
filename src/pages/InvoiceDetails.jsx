@@ -19,11 +19,16 @@ function InvoiceDetail() {
   const canvasRef = useRef(null);
 
   useEffect(() => {
+    const authToken = sessionStorage.getItem('token');
+    if (!authToken) navigate('/login', { replace: true });
+  }, [navigate]);
+
+  useEffect(() => {
     const fetchInvoice = async () => {
       try {
         const token = sessionStorage.getItem('token');
         if (!token) {
-          navigate('/invoices');
+          navigate('/login', { replace: true });
           return;
         }
         const response = await fetch(`${API_BASE_URL}/Invoices/${invoiceId}`, {

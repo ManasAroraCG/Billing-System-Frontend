@@ -1,7 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 
 function Catalog() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = sessionStorage.getItem('token');
+    if (!token) navigate('/login', { replace: true });
+  }, [navigate]);
+
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('Taps');
   const [showAddModal, setShowAddModal] = useState(false);

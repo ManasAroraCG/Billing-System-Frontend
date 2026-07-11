@@ -25,6 +25,11 @@ export default function ModifyPrices() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
+    const token = sessionStorage.getItem('token');
+    if (!token) navigate('/login', { replace: true });
+  }, [navigate]);
+
+  useEffect(() => {
     fetchPricing();
   }, [buyerId]);
 

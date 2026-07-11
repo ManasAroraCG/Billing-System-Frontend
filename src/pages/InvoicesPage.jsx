@@ -6,6 +6,12 @@ import { API_BASE_URL } from '../services/api';
 
 function Invoices() {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = sessionStorage.getItem('token');
+    if (!token) navigate('/login', { replace: true });
+  }, [navigate]);
+
   const [selectedBuyer, setSelectedBuyer] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
   const [invoiceNumber, setInvoiceNumber] = useState('');

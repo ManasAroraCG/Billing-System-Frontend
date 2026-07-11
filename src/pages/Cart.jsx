@@ -1,7 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 
 function Cart() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = sessionStorage.getItem('token');
+    if (!token) navigate('/login', { replace: true });
+  }, [navigate]);
+
   const [cart, setCart] = useState(() => {
     const saved = sessionStorage.getItem('orderCart');
     return saved ? JSON.parse(saved) : {};

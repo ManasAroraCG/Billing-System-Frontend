@@ -21,6 +21,12 @@ import getAuthToken from "../utils/auth";
 export default function Buyers() {
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    const token = sessionStorage.getItem('token');
+    if (!token) navigate('/login', { replace: true });
+  }, [navigate]);
+
   const [buyers, setBuyers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
