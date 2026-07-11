@@ -1,8 +1,8 @@
 import { Routes, Route } from 'react-router-dom';
-import Homepage from './components/pages/Homepage';
-import Catalog from './components/pages/Catalog';
-import Invoices from './components/pages/Invoices';
-import Buyers from './components/pages/Buyers';
+import Homepage from './pages/Homepage';
+import Catalog from './pages/Catalog';
+import Invoices from './pages/Invoices';
+import Buyers from './pages/Buyers';
 
 function App() {
   return (

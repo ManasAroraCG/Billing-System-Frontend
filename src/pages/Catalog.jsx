@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Navbar from '../Navbar';
+import Navbar from '../components/Navbar';
 
 function Catalog() {
   const [sidebarOpen, setSidebarOpen] = useState(true);

@@ -1,4 +1,4 @@
-import Navbar from '../Navbar';
+import Navbar from '../components/Navbar';
 import { useState, useEffect } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
