@@ -1,0 +1,284 @@
+/* =========================
+   MODIFY PRICES PAGE
+========================= */
+
+.modify-prices-page {
+  min-height: 100vh;
+  background: #f7f5f1;
+  color: #2b1b13;
+}
+
+.modify-prices-container {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 72px 24px 24px;
+
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.pricing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.pricing-header h1 {
+  margin: 12px 0 6px;
+  font-size: 30px;
+  font-weight: 600;
+  color: #2b1b13;
+}
+
+.pricing-header p {
+  margin: 0;
+  color: #7b6d60;
+  font-size: 14px;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  background: white;
+  border: 1px solid #ddd7cc;
+  border-radius: 10px;
+
+  padding: 10px 14px;
+
+  cursor: pointer;
+
+  color: #7b6d60;
+  font-size: 13px;
+  font-weight: 500;
+
+  transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+  background: #f3f0ea;
+}
+
+.save-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  border: none;
+
+  padding: 12px 18px;
+
+  border-radius: 10px;
+
+  background: #9d7d16;
+  color: white;
+
+  cursor: pointer;
+  font-weight: 600;
+
+  transition: all 0.25s ease;
+}
+
+.save-btn:hover {
+  background: #876910;
+}
+
+/* =========================
+   BUYER SUMMARY
+========================= */
+
+.buyer-summary-card {
+  background: #efede7;
+
+  border: 1px solid #ddd7cc;
+
+  border-radius: 16px;
+
+  padding: 20px;
+
+  margin-bottom: 20px;
+
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.summary-item span {
+  display: block;
+
+  color: #7b6d60;
+
+  font-size: 12px;
+
+  margin-bottom: 6px;
+
+  text-transform: uppercase;
+
+  letter-spacing: 1px;
+}
+
+.summary-item strong {
+  color: #2b1b13;
+  font-size: 16px;
+}
+
+/* =========================
+   SEARCH
+========================= */
+
+.search-box {
+  background: #efede7;
+
+  border: 1px solid #ddd7cc;
+
+  border-radius: 14px;
+
+  padding: 12px 16px;
+
+  margin-bottom: 22px;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.search-box svg {
+  color: #7b6d60;
+}
+
+.search-box input {
+  flex: 1;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  color: #2b1b13;
+
+  font-size: 14px;
+}
+
+/* =========================
+   TABLE CARD
+========================= */
+
+.catalog-card {
+  background: #efede7;
+
+  border: 1px solid #ddd7cc;
+
+  border-radius: 18px;
+
+  overflow: hidden;
+}
+
+/* =========================
+   TABLE
+========================= */
+
+.catalog-pricing-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.catalog-pricing-table thead {
+  background: #e8e3d8;
+}
+
+.catalog-pricing-table th {
+  text-align: left;
+
+  padding: 16px;
+
+  color: #7b6d60;
+
+  font-size: 12px;
+
+  letter-spacing: 1px;
+
+  font-weight: 700;
+}
+
+.catalog-pricing-table td {
+  padding: 16px;
+
+  border-top: 1px solid #ddd7cc;
+
+  color: #2b1b13;
+
+  font-size: 14px;
+}
+
+.catalog-pricing-table tbody tr {
+  transition: all 0.2s ease;
+}
+
+.catalog-pricing-table tbody tr:hover {
+  background: #f5f2ec;
+}
+
+/* =========================
+   PRICE INPUT
+========================= */
+
+.price-input {
+  width: 120px;
+
+  padding: 8px 12px;
+
+  border: 1px solid #d4cdc1;
+
+  border-radius: 8px;
+
+  background: white;
+
+  color: #2b1b13;
+}
+
+.price-input:focus {
+  outline: none;
+  border-color: #9d7d16;
+}
+
+/* =========================
+   DISCOUNT VALUE
+========================= */
+
+.discount-value {
+  color: #10955d;
+  font-weight: 600;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 900px) {
+  .buyer-summary-card {
+    grid-template-columns: 1fr;
+  }
+
+  .pricing-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .modify-prices-container {
+    padding: 90px 16px 16px;
+  }
+
+  .catalog-card {
+    overflow-x: auto;
+  }
+
+  .catalog-pricing-table {
+    min-width: 900px;
+  }
+}
