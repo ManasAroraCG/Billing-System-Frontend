@@ -1,0 +1,283 @@
+.buyer-side-panel {
+  position: fixed;
+  top: 60px;
+  right: 0;
+
+  width: 380px;
+  height: calc(100vh - 60px);
+
+  background: #fff;
+
+  padding: 20px;
+
+  overflow-y: auto;
+
+  border-left: 1px solid #e7dfd2;
+
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.08);
+
+  z-index: 999;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+
+.panel-header h3 {
+  margin: 0;
+  font-size: 22px;
+  color: #2b1b13;
+}
+
+.panel-subtitle {
+  margin-top: 4px;
+  color: #7b6d60;
+  font-size: 12px;
+}
+
+.panel-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.buyer-profile-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  padding: 14px;
+
+  background: #faf8f4;
+  border: 1px solid #e7dfd2;
+  border-radius: 14px;
+}
+
+.buyer-profile-avatar {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+
+  border-radius: 14px;
+
+  background: #d6c49f;
+  color: #957418;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.buyer-profile-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2b1b13;
+}
+
+.buyer-profile-location {
+  margin-top: 4px;
+  font-size: 13px;
+  color: #7b6d60;
+  line-height: 1.5;
+}
+
+.buyer-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.buyer-metric-card {
+  background: white;
+
+  border: 1px solid #e7dfd2;
+  border-radius: 12px;
+
+  padding: 14px;
+}
+
+.buyer-metric-card label {
+  display: block;
+
+  color: #7b6d60;
+  font-size: 12px;
+
+  margin-bottom: 8px;
+}
+
+.buyer-metric-card span {
+  display: block;
+
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.revenue-highlight {
+  color: #957418;
+}
+
+.success-value {
+  color: #14a05c;
+}
+
+.danger-value {
+  color: #d8614b;
+}
+
+.panel-divider {
+  height: 1px;
+  background: #ece7df;
+}
+
+.buyer-detail-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.detail-group {
+  background: white;
+
+  border: 1px solid #e7dfd2;
+  border-radius: 12px;
+
+  padding: 12px 14px;
+}
+
+.detail-group label {
+  display: block;
+
+  margin-bottom: 6px;
+
+  color: #7b6d60;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.detail-group span {
+  display: block;
+
+  color: #2b1b13;
+  font-size: 14px;
+  font-weight: 500;
+
+  word-break: break-word;
+}
+
+.status-success {
+  color: #14a05c;
+  font-weight: 600;
+}
+
+.status-danger {
+  color: #d8614b;
+  font-weight: 600;
+}
+
+.side-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  margin-top: 20px;
+}
+
+.side-actions button {
+  width: 100%;
+}
+
+.modal-close {
+  width: 34px;
+  height: 34px;
+
+  border-radius: 8px;
+  border: 1px solid #ddd7cc;
+
+  background: white;
+  cursor: pointer;
+
+  font-size: 18px;
+}
+
+.modal-close:hover {
+  background: #f5f2ec;
+}
+
+/* MOBILE */
+
+@media (max-width: 768px) {
+  .buyer-side-panel {
+    top: 60px;
+    left: 0;
+    right: 0;
+
+    width: 100%;
+    height: calc(100vh - 60px);
+
+    border-left: none;
+
+    border-radius: 18px 18px 0 0;
+
+    padding: 16px;
+  }
+
+  .buyer-profile-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .buyer-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .buyer-profile-name {
+    font-size: 16px;
+  }
+
+  .buyer-profile-location {
+    font-size: 12px;
+  }
+}
+
+.buyer-side-panel * {
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.buyer-profile-card {
+  display: flex !important;
+  align-items: center !important;
+  flex-direction: row !important;
+}
+
+.buyer-metric-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.buyer-metric-card label {
+  width: 100%;
+}
+
+.buyer-metric-card span {
+  width: 100%;
+}
+
+.detail-group {
+  text-align: left !important;
+}
+
+.detail-group label {
+  text-align: left !important;
+}
+
+.detail-group span {
+  text-align: left !important;
+}

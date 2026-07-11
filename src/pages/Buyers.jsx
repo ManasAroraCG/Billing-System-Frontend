@@ -2,7 +2,10 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 import "../styles/buyers.css";
-
+import "../styles/buyerSidePanel.css";
+import "../styles/buyersTable.css";
+import "../styles/editBuyerModal.css";
+import "../styles/buyerInsights.css";
 import BuyerTable from "../components/BuyerTable";
 import BuyerSidePanel from "../components/BuyerSidePanel";
 

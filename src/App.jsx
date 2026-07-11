@@ -8,7 +8,7 @@ import GenerateBill from "./pages/GenerateBill";
 import ModifyPrices from "./pages/ModifyPrices";
 import Invoices from "./pages/InvoicesPage";
 import InvoiceDetail from "./pages/InvoiceDetails";
-
+import LoginPage from "./pages/Login";
 function App() {
   return (
     <Routes>
@@ -22,6 +22,7 @@ function App() {
       <Route path="/modify-prices/:buyerId" element={<ModifyPrices />} />
       <Route path="/invoices" element={<Invoices />} />
       <Route path="/invoice/:invoiceId" element={<InvoiceDetail />} />
+      <Route path="/login" element={<LoginPage />} />
     </Routes>
   );
 }
