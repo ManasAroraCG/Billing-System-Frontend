@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import "../styles/buyers.css";
@@ -72,10 +72,28 @@ export default function Buyers() {
 
   const [showInsightsModal, setShowInsightsModal] = useState(false);
 
+  useEffect(() => {
+  const handleOpenBuyerModal = () => {
+    setShowNewBuyerModal(true);
+  };
+
+  window.addEventListener(
+    "openAddBuyerModal",
+    handleOpenBuyerModal
+  );
+
+  return () => {
+    window.removeEventListener(
+      "openAddBuyerModal",
+      handleOpenBuyerModal
+    );
+  };
+}, []);
+
   const handleCreateBuyer = (buyerData) => {
     const newBuyer = {
       ...buyerData,
-      id: Date.now(),
+      id: 1 + Math.max(0, ...buyers.map((b) => b.id)),
       initials: buyerData.name
         .split(" ")
         .slice(0, 2)
@@ -177,13 +195,24 @@ export default function Buyers() {
           <div className="drawer-overlay">
             <BuyerSidePanel
               buyer={selectedBuyer}
-              onModifyPrices={() => {
-                setPricingBuyer(selectedBuyer);
-                setSelectedBuyer(null);
-                setShowPricingModal(true);
-              }}
+
+                // setPricingBuyer(selectedBuyer);
+                // setSelectedBuyer(null);
+                // setShowPricingModal(true);
+                onModifyPrices={() => {
+                  navigate(
+                    `/modify-prices/${selectedBuyer.id}`,
+                    {
+
+                      state: { buyer: selectedBuyer }
+                    }
+                  );
+                }}
+              
               onCreateOrder={() =>
-                navigate(`/orders/create?buyerId=${selectedBuyer.id}`)
+                navigate(`/create-order/${selectedBuyer.id}`, {
+                  state: { buyer: selectedBuyer }
+                })
               }
               onClose={() => setSelectedBuyer(null)}
             />
