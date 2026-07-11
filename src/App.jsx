@@ -7,11 +7,12 @@ import Buyers from "./pages/Buyers";
 import CreateOrder from "./pages/CreateOrder";
 import Cart from "./pages/Cart";
 import GenerateBill from "./pages/GenerateBill";
+import ModifyPrices from "./pages/ModifyPrices";
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<InvoicesPage />} />
+      <Route path="/" element={<Homepage />} />
       <Route path="/invoices" element={<InvoicesPage />} />
       <Route path="/invoices/:invoiceId" element={<InvoiceDetails />} />
       <Route path="/home" element={<Homepage />} />
@@ -20,6 +21,7 @@ function App() {
       <Route path="/create-order" element={<CreateOrder />} />
       <Route path="/cart" element={<Cart />} />
       <Route path="/generate-bill" element={<GenerateBill />} />
+      <Route path="/modify-prices/:buyerId" element={<ModifyPrices />} />
     </Routes>
   );
 }
