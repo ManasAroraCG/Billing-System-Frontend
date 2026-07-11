@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Navbar from '../components/Navbar';
+import { createInvoice, updateProductStock } from '../api';
 
 function Cart() {
   const [cart, setCart] = useState(() => {
@@ -45,9 +46,46 @@ function Cart() {
   const gst = subtotal * 0.05;
   const grandTotal = subtotal + gst;
 
-  const handleGenerateBill = () => {
-  window.location.href = '/generate-bill';
-};
+  const handleGenerateBill = async () => {
+    try {
+      const buyerStr = sessionStorage.getItem('selectedBuyer');
+      if (!buyerStr) {
+        alert("No buyer selected. Please go back to Create Order and select a buyer.");
+        return;
+      }
+      const buyer = JSON.parse(buyerStr);
+      
+      const payload = {
+        customerId: buyer.id,
+        invoiceDate: new Date().toISOString(),
+        dueDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString(),
+        remarks: "Generated from cart",
+        items: cartItems.map(item => ({
+          productId: item.id,
+          quantity: parseInt(item.quantity),
+          overrideRate: parseFloat(item.price)
+        }))
+      };
+
+      const invoice = await createInvoice(payload);
+      
+      // Deduct stock for each item
+      await Promise.all(
+        cartItems.map(item => 
+          updateProductStock(item.id, -parseInt(item.quantity), 'add')
+        )
+      );
+      
+      sessionStorage.setItem('generatedBillId', invoice.id);
+      sessionStorage.removeItem('orderCart');
+      sessionStorage.removeItem('selectedBuyer');
+      
+      window.location.href = '/generate-bill';
+    } catch (err) {
+      console.error("Failed to generate bill", err);
+      alert("Failed to generate bill. Check console for details.");
+    }
+  };
 
   return (
     <div style={{ minHeight: '100vh', background: '#ffffff', position: 'relative' }}>

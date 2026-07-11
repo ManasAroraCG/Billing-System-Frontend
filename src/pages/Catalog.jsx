@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
+import { getCategories, getProducts, getAdminProductsWithPrices, createProduct, updateProduct, deleteProduct, updateProductStock, uploadProductImage } from '../api';
 
 function Catalog() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -7,70 +8,40 @@ function Catalog() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [products, setProducts] = useState({
-    Taps: [
-      { id: 1, name: 'Premium Chrome Tap', model: '1001', price: 89.99, stock: 45, image: 'https://images.pexels.com/photos/4194987/pexels-photo-4194987.jpeg' },
-      { id: 2, name: 'Modern Kitchen Tap', model: '1002', price: 129.99, stock: 32, image: 'https://images.pexels.com/photos/36718391/pexels-photo-36718391.jpeg' },
-      { id: 3, name: 'Classic Brass Tap', model: '1003', price: 74.99, stock: 28, image: 'https://images.pexels.com/photos/27459830/pexels-photo-27459830.jpeg' },
-      { id: 4, name: 'Wall-Mounted Tap', model: '1004', price: 109.99, stock: 18, image: 'https://media.istockphoto.com/id/637267736/photo/washbasin-with-wall-mounted-tap.jpg?b=1&s=612x612&w=0&k=20&c=RY7qudHcYlBPackosv8SYHCzj3H7ytUxAIp9dBFEwE8=' },
-      { id: 5, name: 'Double Sink Tap', model: '1005', price: 159.99, stock: 12, image: 'https://media.istockphoto.com/id/1773185927/photo/close-up-of-comfortable-double-sink-with-two-round-mirrors-standing-on-wooden-countertop-in.jpg?b=1&s=612x612&w=0&k=20&c=ya14qVYDJL_Iw15I48UWspnd4EI2E5ArhU5JqFa9zI0=' },
-      { id: 6, name: 'Kitchen Mixer Tap', model: '1006', price: 94.99, stock: 38, image: 'https://media.istockphoto.com/id/618044742/photo/white-marble-kitchen.jpg?b=1&s=612x612&w=0&k=20&c=lfNa8irbxO6ojgJ3CbmUrrVpiwLJYW77QlX15Brl50k=' }
-    ],
-    Showers: [
-      { id: 1, name: 'Rainfall Shower', model: '2001', price: 199.99, stock: 20, image: 'https://images.pexels.com/photos/37252312/pexels-photo-37252312.jpeg' },
-      { id: 2, name: 'Handheld Shower', model: '2002', price: 89.99, stock: 35, image: 'https://images.pexels.com/photos/5644300/pexels-photo-5644300.jpeg' },
-      { id: 3, name: 'Waterfall Shower', model: '2003', price: 249.99, stock: 15, image: 'https://images.pexels.com/photos/32208794/pexels-photo-32208794.jpeg' },
-      { id: 4, name: 'LED Shower Head', model: '2004', price: 129.99, stock: 25, image: 'https://media.istockphoto.com/id/1781441293/photo/shower-enclosure-in-bathroom-with-chair-shampoo-mockup-rain-shower-green-tropical-tree-in.jpg?b=1&s=612x612&w=0&k=20&c=OlOwJhdM-kiinA-KV1wP3k-77Ivr6xF7_4Hv0hZLECI=' },
-      { id: 5, name: 'Modern Panel Shower', model: '2005', price: 319.99, stock: 10, image: 'https://media.istockphoto.com/id/1308282338/photo/modern-bathroom-interior-stock-photo.jpg?b=1&s=612x612&w=0&k=20&c=f5EVBSSj7xAqybgeUpKgyWy4pOK1-NoNiHoVSXHphcE=' },
-      { id: 6, name: 'Thermostatic Shower', model: '2006', price: 179.99, stock: 22, image: 'https://images.pexels.com/photos/6538897/pexels-photo-6538897.jpeg' }
-    ],
-    Washbasins: [
-      { id: 1, name: 'Ceramic Washbasin', model: '3001', price: 149.99, stock: 30, image: 'https://images.pexels.com/photos/7031215/pexels-photo-7031215.jpeg' },
-      { id: 2, name: 'Stone Basin', model: '3002', price: 229.99, stock: 18, image: 'https://images.pexels.com/photos/29504875/pexels-photo-29504875.jpeg' },
-      { id: 3, name: 'Glass Washbasin', model: '3003', price: 189.99, stock: 14, image: 'https://images.pexels.com/photos/30986990/pexels-photo-30986990.jpeg' },
-      { id: 4, name: 'Pedestal Basin', model: '3004', price: 129.99, stock: 25, image: 'https://images.pexels.com/photos/6394611/pexels-photo-6394611.jpeg' },
-      { id: 5, name: 'Wall-Hung Basin', model: '3005', price: 169.99, stock: 20, image: 'https://images.pexels.com/photos/29399425/pexels-photo-29399425.jpeg' },
-      { id: 6, name: 'Marble Washbasin', model: '3006', price: 299.99, stock: 8, image: 'https://images.pexels.com/photos/29631655/pexels-photo-29631655.jpeg' }
-    ],
-    Bathtubs: [
-      { id: 1, name: 'Freestanding Tub', model: '4001', price: 899.99, stock: 10, image: 'https://images.pexels.com/photos/6634894/pexels-photo-6634894.jpeg' },
-      { id: 2, name: 'Corner Bathtub', model: '4002', price: 699.99, stock: 8, image: 'https://images.pexels.com/photos/18252719/pexels-photo-18252719.jpeg' },
-      { id: 3, name: 'Whirlpool Tub', model: '4003', price: 1299.99, stock: 5, image: 'https://images.pexels.com/photos/33347404/pexels-photo-33347404.jpeg' },
-      { id: 4, name: 'Modern Soaking Tub', model: '4004', price: 749.99, stock: 12, image: 'https://images.pexels.com/photos/9695833/pexels-photo-9695833.jpeg' },
-      { id: 5, name: 'Luxury Bathtub', model: '4005', price: 1599.99, stock: 3, image: 'https://media.istockphoto.com/id/1973276016/photo/modern-minimalist-bathroom-interior-bathtub-and-bathroom-cabinet-white-sink-interior-plants.jpg?b=1&s=612x612&w=0&k=20&c=GCpvge58as0Yt618BzbHmSHJr8bcKOT9I2WIM59jd1Y=' },
-      { id: 6, name: 'Clawfoot Tub', model: '4006', price: 1099.99, stock: 6, image: 'https://images.pexels.com/photos/4239626/pexels-photo-4239626.jpeg' }
-    ],
-    Drains: [
-      { id: 1, name: 'Linear Drain', model: '5001', price: 49.99, stock: 60, image: 'https://images.pexels.com/photos/8793484/pexels-photo-8793484.jpeg' },
-      { id: 2, name: 'Square Drain', model: '5002', price: 39.99, stock: 75, image: 'https://images.pexels.com/photos/4194982/pexels-photo-4194982.jpeg' },
-      { id: 3, name: 'Round Drain Cover', model: '5003', price: 29.99, stock: 90, image: 'https://images.pexels.com/photos/6653891/pexels-photo-6653891.jpeg' },
-      { id: 4, name: 'Stainless Drain', model: '5004', price: 44.99, stock: 55, image: 'https://images.pexels.com/photos/6580376/pexels-photo-6580376.jpeg' },
-      { id: 5, name: 'Brass Drain', model: '5005', price: 59.99, stock: 40, image: 'https://images.pexels.com/photos/10919427/pexels-photo-10919427.jpeg' },
-      { id: 6, name: 'Shower Drain', model: '5006', price: 34.99, stock: 85, image: 'https://images.pexels.com/photos/34574600/pexels-photo-34574600.jpeg' }
-    ]
-  });
-
+  const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState([]);
   const [editValues, setEditValues] = useState({});
-
-  const categories = [
-    { name: 'Taps' },
-    { name: 'Showers' },
-    { name: 'Washbasins' },
-    { name: 'Bathtubs' },
-    { name: 'Drains' }
-  ];
-
+  const [deleteMode, setDeleteMode] = useState(false);
+  
   const [newProduct, setNewProduct] = useState({
     name: '',
     model: '',
     price: '',
     stock: '',
-    image: ''
+    imageFile: null
   });
 
-  const [deleteMode, setDeleteMode] = useState(false);
+  useEffect(() => {
+    getCategories().then(data => {
+      setCategories(data);
+      if (data.length > 0 && typeof selectedCategory === 'string' && selectedCategory.length < 10) {
+        setSelectedCategory(data[0].id);
+      }
+    }).catch(err => console.error("Error fetching categories:", err));
+  }, []);
 
-  const currentProducts = products[selectedCategory] || [];
+  useEffect(() => {
+    if (selectedCategory && selectedCategory.length > 10) {
+      getAdminProductsWithPrices(selectedCategory).then(data => {
+        setProducts(data.map(p => ({ ...p, price: p.basePrice, image: p.imageUrl })));
+        setEditValues({});
+        setHasChanges(false);
+        setDeleteMode(false);
+      }).catch(err => console.error("Error fetching products:", err));
+    }
+  }, [selectedCategory]);
+
+  const currentProducts = products;
 
   const handleEditChange = (productId, field, value) => {
     setHasChanges(true);
@@ -86,7 +57,7 @@ function Catalog() {
   const incrementValue = (productId, field) => {
     const currentValue = editValues[productId]?.[field] !== undefined 
       ? parseFloat(editValues[productId][field]) 
-      : products[selectedCategory].find(p => p.id === productId)?.[field] || 0;
+      : products.find(p => p.id === productId)?.[field] || 0;
     
     const increment = field === 'price' ? 10 : 1;
     handleEditChange(productId, field, (currentValue + increment).toString());
@@ -96,7 +67,7 @@ function Catalog() {
   const decrementValue = (productId, field) => {
     const currentValue = editValues[productId]?.[field] !== undefined 
       ? parseFloat(editValues[productId][field]) 
-      : products[selectedCategory].find(p => p.id === productId)?.[field] || 0;
+      : products.find(p => p.id === productId)?.[field] || 0;
     
     const decrement = field === 'price' ? 10 : 1;
     const newValue = Math.max(0, currentValue - decrement);
@@ -104,59 +75,82 @@ function Catalog() {
     setHasChanges(true);
   };
 
-  const handleApplyChanges = () => {
-    setProducts(prev => {
-      const updated = { ...prev };
-      updated[selectedCategory] = prev[selectedCategory].map(product => {
-        if (editValues[product.id]) {
-          return {
-            ...product,
-            price: editValues[product.id].price !== undefined ? parseFloat(editValues[product.id].price) || product.price : product.price,
-            stock: editValues[product.id].stock !== undefined ? parseInt(editValues[product.id].stock) || product.stock : product.stock
-          };
+  const handleApplyChanges = async () => {
+    try {
+      for (const [id, updates] of Object.entries(editValues)) {
+        if (updates.deleted) {
+          await deleteProduct(id);
+          continue;
         }
-        return product;
-      });
-      return updated;
-    });
-    setEditValues({});
-    setHasChanges(false);
+        if (updates.price !== undefined) {
+          const product = products.find(p => p.id === id);
+          if (product) {
+            await updateProduct(id, {
+              name: product.name,
+              modelNumber: product.modelNumber || product.model || "",
+              categoryId: product.categoryId,
+              description: product.description || "",
+              basePrice: parseFloat(updates.price),
+              stock: product.stock,
+              isActive: product.isActive !== undefined ? product.isActive : true,
+              imageUrl: product.image,
+              imagePublicId: product.imagePublicId
+            });
+          }
+        }
+        if (updates.stock !== undefined) {
+          const product = products.find(p => p.id === id);
+          if (product) {
+            await updateProductStock(id, parseInt(updates.stock), 'set');
+          }
+        }
+      }
+      const updatedProducts = await getAdminProductsWithPrices(selectedCategory);
+      setProducts(updatedProducts.map(p => ({ ...p, price: p.basePrice, image: p.imageUrl })));
+      setEditValues({});
+      setHasChanges(false);
+      setDeleteMode(false);
+    } catch (error) {
+      console.error("Error updating products", error);
+      alert("Failed to apply changes");
+    }
   };
 
   const handleDeleteProduct = (productId) => {
-    setProducts(prev => ({
+    setEditValues(prev => ({
       ...prev,
-      [selectedCategory]: prev[selectedCategory].filter(p => p.id !== productId)
+      [productId]: { ...prev[productId], deleted: true }
     }));
+    setHasChanges(true);
   };
 
-  const handleAddProduct = () => {
-    if (!newProduct.name || !newProduct.model || !newProduct.price || !newProduct.stock || !newProduct.image) {
-      alert('Please fill all fields');
+  const handleAddProduct = async () => {
+    if (!newProduct.name || !newProduct.model || !newProduct.price || !newProduct.stock) {
+      alert('Please fill all required fields');
       return;
     }
 
-    const newId = currentProducts.length > 0 
-      ? Math.max(...currentProducts.map(p => p.id)) + 1 
-      : 1;
-
-    setProducts(prev => ({
-      ...prev,
-      [selectedCategory]: [
-        ...prev[selectedCategory],
-        {
-          id: newId,
-          name: newProduct.name,
-          model: newProduct.model,
-          price: parseFloat(newProduct.price),
-          stock: parseInt(newProduct.stock),
-          image: newProduct.image
-        }
-      ]
-    }));
-
-    setNewProduct({ name: '', model: '', price: '', stock: '', image: '' });
-    setShowAddModal(false);
+    try {
+      const created = await createProduct({
+        categoryId: selectedCategory,
+        name: newProduct.name,
+        modelNumber: newProduct.model,
+        basePrice: parseFloat(newProduct.price),
+        stock: parseInt(newProduct.stock)
+      });
+      
+      if (newProduct.imageFile) {
+        await uploadProductImage(created.id, newProduct.imageFile);
+      }
+      
+      const updatedProducts = await getAdminProductsWithPrices(selectedCategory);
+      setProducts(updatedProducts.map(p => ({ ...p, price: p.basePrice, image: p.imageUrl })));
+      setNewProduct({ name: '', model: '', price: '', stock: '', imageFile: null });
+      setShowAddModal(false);
+    } catch (error) {
+      console.error("Error creating product", error);
+      alert("Failed to add product");
+    }
   };
 
   return (
@@ -249,9 +243,9 @@ function Catalog() {
             
             {categories.map((cat) => (
               <button
-                key={cat.name}
+                key={cat.id}
                 onClick={() => {
-                  setSelectedCategory(cat.name);
+                  setSelectedCategory(cat.id);
                   setEditValues({});
                   setHasChanges(false);
                   setDeleteMode(false);
@@ -264,12 +258,12 @@ function Catalog() {
                   padding: '10px 16px',
                   border: 'none',
                   borderRadius: '8px',
-                  background: selectedCategory === cat.name ? '#e5eeff' : 'transparent',
-                  color: selectedCategory === cat.name ? '#8B6914' : '#5C4033',
+                  background: selectedCategory === cat.id ? '#e5eeff' : 'transparent',
+                  color: selectedCategory === cat.id ? '#8B6914' : '#5C4033',
                   cursor: 'pointer',
                   fontFamily: "'Inter', sans-serif",
                   fontSize: '14px',
-                  fontWeight: selectedCategory === cat.name ? 600 : 400,
+                  fontWeight: selectedCategory === cat.id ? 600 : 400,
                   transition: 'all 0.2s ease',
                   marginBottom: '4px'
                 }}
@@ -393,9 +387,9 @@ function Catalog() {
 
           {categories.map((cat) => (
             <button
-              key={cat.name}
+              key={cat.id}
               onClick={() => {
-                setSelectedCategory(cat.name);
+                setSelectedCategory(cat.id);
                 setEditValues({});
                 setHasChanges(false);
                 setDeleteMode(false);
@@ -409,12 +403,12 @@ function Catalog() {
                 padding: '12px 16px',
                 border: 'none',
                 borderRadius: '8px',
-                background: selectedCategory === cat.name ? '#e5eeff' : 'transparent',
-                color: selectedCategory === cat.name ? '#8B6914' : '#5C4033',
+                background: selectedCategory === cat.id ? '#e5eeff' : 'transparent',
+                color: selectedCategory === cat.id ? '#8B6914' : '#5C4033',
                 cursor: 'pointer',
                 fontFamily: "'Inter', sans-serif",
                 fontSize: '15px',
-                fontWeight: selectedCategory === cat.name ? 600 : 400,
+                fontWeight: selectedCategory === cat.id ? 600 : 400,
                 marginBottom: '4px'
               }}
             >
@@ -538,7 +532,7 @@ function Catalog() {
               fontWeight: 600,
               margin: 0
             }}>
-              {selectedCategory}
+              {categories.find(c => c.id === selectedCategory)?.name || selectedCategory}
             </h2>
             <span style={{
               fontFamily: "'Inter', sans-serif",
@@ -558,7 +552,10 @@ function Catalog() {
             justifyItems: 'center',
             marginTop: '0'
           }}>
-            {currentProducts.map((product) => (
+            {currentProducts.map((product) => {
+              if (editValues[product.id]?.deleted) return null;
+              
+              return (
               <div
                 key={product.id}
                 style={{
@@ -664,7 +661,7 @@ function Catalog() {
                     padding: '3px 10px',
                     borderRadius: '12px'
                   }}>
-                    {product.model}
+                    {product.modelNumber || product.model}
                   </span>
                 </div>
 
@@ -825,7 +822,7 @@ function Catalog() {
                   </button>
                 </div>
               </div>
-            ))}
+            )})}
           </div>
         </div>
       </div>
@@ -924,10 +921,13 @@ function Catalog() {
               />
 
               <input
-                type="url"
-                placeholder="Image URL"
-                value={newProduct.image}
-                onChange={(e) => setNewProduct({...newProduct, image: e.target.value})}
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    setNewProduct({...newProduct, imageFile: e.target.files[0]});
+                  }
+                }}
                 style={{
                   padding: '12px 16px',
                   border: '1px solid #e2e8f0',
@@ -936,7 +936,8 @@ function Catalog() {
                   fontSize: '14px',
                   outline: 'none',
                   color: '#2C1810',
-                  background: '#ffffff'
+                  background: '#ffffff',
+                  cursor: 'pointer'
                 }}
                 onFocus={(e) => {
                   e.target.style.borderColor = '#8B6914';

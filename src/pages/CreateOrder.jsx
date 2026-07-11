@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
+import { getCustomers, getCategories, getCustomerProductsWithPrices, getAdminProductsWithPrices } from '../api';
 
 function CreateOrder() {
   const [showBuyerModal, setShowBuyerModal] = useState(true);
@@ -14,96 +15,83 @@ function CreateOrder() {
   const [flashCategory, setFlashCategory] = useState('Taps');
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
-  // Buyers data
-  const buyers = [
-    { id: 1, name: 'Ramesh Constructions', city: 'Mumbai', discount: 5 },
-    { id: 2, name: 'Patel Builders', city: 'Ahmedabad', discount: 8 },
-    { id: 3, name: 'Mehta Interiors', city: 'Delhi', discount: 3 },
-    { id: 4, name: 'Sharma Enterprise', city: 'Jaipur', discount: 10 },
-    { id: 5, name: 'Singh Infrastructure', city: 'Lucknow', discount: 6 },
-    { id: 6, name: 'Verma Developers', city: 'Bangalore', discount: 7 },
-    { id: 7, name: 'Gupta Trading Co.', city: 'Kolkata', discount: 4 },
-    { id: 8, name: 'Joshi Sanitary Works', city: 'Pune', discount: 9 }
-  ];
+  const [buyers, setBuyers] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [productsMap, setProductsMap] = useState({});
 
-  // Products data
-  const baseProducts = {
-    Taps: [
-      { id: 1, name: 'Premium Chrome Tap', model: '1001', basePrice: 89.99, stock: 45, image: 'https://images.pexels.com/photos/4194987/pexels-photo-4194987.jpeg' },
-      { id: 2, name: 'Modern Kitchen Tap', model: '1002', basePrice: 129.99, stock: 32, image: 'https://images.pexels.com/photos/36718391/pexels-photo-36718391.jpeg' },
-      { id: 3, name: 'Classic Brass Tap', model: '1003', basePrice: 74.99, stock: 28, image: 'https://images.pexels.com/photos/27459830/pexels-photo-27459830.jpeg' },
-      { id: 4, name: 'Wall-Mounted Tap', model: '1004', basePrice: 109.99, stock: 18, image: 'https://media.istockphoto.com/id/637267736/photo/washbasin-with-wall-mounted-tap.jpg?b=1&s=612x612&w=0&k=20&c=RY7qudHcYlBPackosv8SYHCzj3H7ytUxAIp9dBFEwE8=' },
-      { id: 5, name: 'Double Sink Tap', model: '1005', basePrice: 159.99, stock: 12, image: 'https://media.istockphoto.com/id/1773185927/photo/close-up-of-comfortable-double-sink-with-two-round-mirrors-standing-on-wooden-countertop-in.jpg?b=1&s=612x612&w=0&k=20&c=ya14qVYDJL_Iw15I48UWspnd4EI2E5ArhU5JqFa9zI0=' },
-      { id: 6, name: 'Kitchen Mixer Tap', model: '1006', basePrice: 94.99, stock: 38, image: 'https://media.istockphoto.com/id/618044742/photo/white-marble-kitchen.jpg?b=1&s=612x612&w=0&k=20&c=lfNa8irbxO6ojgJ3CbmUrrVpiwLJYW77QlX15Brl50k=' }
-    ],
-    Showers: [
-      { id: 7, name: 'Rainfall Shower', model: '2001', basePrice: 199.99, stock: 20, image: 'https://images.pexels.com/photos/37252312/pexels-photo-37252312.jpeg' },
-      { id: 8, name: 'Handheld Shower', model: '2002', basePrice: 89.99, stock: 35, image: 'https://images.pexels.com/photos/5644300/pexels-photo-5644300.jpeg' },
-      { id: 9, name: 'Waterfall Shower', model: '2003', basePrice: 249.99, stock: 15, image: 'https://images.pexels.com/photos/32208794/pexels-photo-32208794.jpeg' },
-      { id: 10, name: 'LED Shower Head', model: '2004', basePrice: 129.99, stock: 25, image: 'https://media.istockphoto.com/id/1781441293/photo/shower-enclosure-in-bathroom-with-chair-shampoo-mockup-rain-shower-green-tropical-tree-in.jpg?b=1&s=612x612&w=0&k=20&c=OlOwJhdM-kiinA-KV1wP3k-77Ivr6xF7_4Hv0hZLECI=' },
-      { id: 11, name: 'Modern Panel Shower', model: '2005', basePrice: 319.99, stock: 10, image: 'https://media.istockphoto.com/id/1308282338/photo/modern-bathroom-interior-stock-photo.jpg?b=1&s=612x612&w=0&k=20&c=f5EVBSSj7xAqybgeUpKgyWy4pOK1-NoNiHoVSXHphcE=' },
-      { id: 12, name: 'Thermostatic Shower', model: '2006', basePrice: 179.99, stock: 22, image: 'https://images.pexels.com/photos/6538897/pexels-photo-6538897.jpeg' }
-    ],
-    Washbasins: [
-      { id: 13, name: 'Ceramic Washbasin', model: '3001', basePrice: 149.99, stock: 30, image: 'https://images.pexels.com/photos/7031215/pexels-photo-7031215.jpeg' },
-      { id: 14, name: 'Stone Basin', model: '3002', basePrice: 229.99, stock: 18, image: 'https://images.pexels.com/photos/29504875/pexels-photo-29504875.jpeg' },
-      { id: 15, name: 'Glass Washbasin', model: '3003', basePrice: 189.99, stock: 14, image: 'https://images.pexels.com/photos/30986990/pexels-photo-30986990.jpeg' },
-      { id: 16, name: 'Pedestal Basin', model: '3004', basePrice: 129.99, stock: 25, image: 'https://images.pexels.com/photos/6394611/pexels-photo-6394611.jpeg' },
-      { id: 17, name: 'Wall-Hung Basin', model: '3005', basePrice: 169.99, stock: 20, image: 'https://images.pexels.com/photos/29399425/pexels-photo-29399425.jpeg' },
-      { id: 18, name: 'Marble Washbasin', model: '3006', basePrice: 299.99, stock: 8, image: 'https://images.pexels.com/photos/29631655/pexels-photo-29631655.jpeg' }
-    ],
-    Bathtubs: [
-      { id: 19, name: 'Freestanding Tub', model: '4001', basePrice: 899.99, stock: 10, image: 'https://images.pexels.com/photos/6634894/pexels-photo-6634894.jpeg' },
-      { id: 20, name: 'Corner Bathtub', model: '4002', basePrice: 699.99, stock: 8, image: 'https://images.pexels.com/photos/18252719/pexels-photo-18252719.jpeg' },
-      { id: 21, name: 'Whirlpool Tub', model: '4003', basePrice: 1299.99, stock: 5, image: 'https://images.pexels.com/photos/33347404/pexels-photo-33347404.jpeg' },
-      { id: 22, name: 'Modern Soaking Tub', model: '4004', basePrice: 749.99, stock: 12, image: 'https://images.pexels.com/photos/9695833/pexels-photo-9695833.jpeg' },
-      { id: 23, name: 'Luxury Bathtub', model: '4005', basePrice: 1599.99, stock: 3, image: 'https://media.istockphoto.com/id/1973276016/photo/modern-minimalist-bathroom-interior-bathtub-and-bathroom-cabinet-white-sink-interior-plants.jpg?b=1&s=612x612&w=0&k=20&c=GCpvge58as0Yt618BzbHmSHJr8bcKOT9I2WIM59jd1Y=' },
-      { id: 24, name: 'Clawfoot Tub', model: '4006', basePrice: 1099.99, stock: 6, image: 'https://images.pexels.com/photos/4239626/pexels-photo-4239626.jpeg' }
-    ],
-    Drains: [
-      { id: 25, name: 'Linear Drain', model: '5001', basePrice: 49.99, stock: 60, image: 'https://images.pexels.com/photos/8793484/pexels-photo-8793484.jpeg' },
-      { id: 26, name: 'Square Drain', model: '5002', basePrice: 39.99, stock: 75, image: 'https://images.pexels.com/photos/4194982/pexels-photo-4194982.jpeg' },
-      { id: 27, name: 'Round Drain Cover', model: '5003', basePrice: 29.99, stock: 90, image: 'https://images.pexels.com/photos/6653891/pexels-photo-6653891.jpeg' },
-      { id: 28, name: 'Stainless Drain', model: '5004', basePrice: 44.99, stock: 55, image: 'https://images.pexels.com/photos/6580376/pexels-photo-6580376.jpeg' },
-      { id: 29, name: 'Brass Drain', model: '5005', basePrice: 59.99, stock: 40, image: 'https://images.pexels.com/photos/10919427/pexels-photo-10919427.jpeg' },
-      { id: 30, name: 'Shower Drain', model: '5006', basePrice: 34.99, stock: 85, image: 'https://images.pexels.com/photos/34574600/pexels-photo-34574600.jpeg' }
-    ]
-  };
-
-  const categories = ['Taps', 'Showers', 'Washbasins', 'Bathtubs', 'Drains'];
-
-  // Get products with buyer-specific pricing
-  const getProducts = () => {
-    const discount = selectedBuyer ? selectedBuyer.discount : 0;
-    const products = {};
-    
-    Object.keys(baseProducts).forEach(category => {
-      products[category] = baseProducts[category].map(product => ({
-        ...product,
-        price: selectedBuyer 
-          ? (product.basePrice * (1 - discount / 100)).toFixed(2)
-          : product.basePrice,
-        originalPrice: product.basePrice,
-        discount: selectedBuyer ? discount : 0
-      }));
-    });
-    
-    return products;
-  };
-
-  const [products, setProducts] = useState(getProducts());
-  const currentProducts = products[selectedCategory] || [];
-  const flashProducts = products[flashCategory] || [];
-
-  // Update products when buyer changes
   useEffect(() => {
-    setProducts(getProducts());
-  }, [selectedBuyer]);
+    getCustomers().then(data => {
+      setBuyers(data.map(c => ({
+        id: c.id,
+        name: c.partyName,
+        city: c.billingAddress?.split(',')[0] || '',
+        discount: 0
+      })));
+    }).catch(console.error);
 
-  // Save cart to session storage
+    getCategories().then(data => {
+      setCategories(data);
+      if (data.length > 0 && selectedCategory === 'Taps') {
+        setSelectedCategory(data[0].name);
+        setFlashCategory(data[0].name);
+      }
+    }).catch(console.error);
+  }, []);
+
+  useEffect(() => {
+    const fetchCatalog = async () => {
+      try {
+        let prods = [];
+        if (selectedBuyer) {
+          prods = await getCustomerProductsWithPrices(selectedBuyer.id);
+        } else {
+          prods = await getAdminProductsWithPrices();
+        }
+        
+        // Group by categoryId
+        const grouped = {};
+        categories.forEach(c => grouped[c.name] = []);
+        
+        prods.forEach(p => {
+          const cat = categories.find(c => c.id === p.categoryId);
+          const catName = cat ? cat.name : 'Uncategorized';
+          if (!grouped[catName]) grouped[catName] = [];
+          
+          grouped[catName].push({
+            id: p.id,
+            name: p.name,
+            model: p.modelNumber || '',
+            price: (p.basePrice || 0).toFixed(2),
+            originalPrice: p.basePrice,
+            stock: p.stock || 0,
+            image: p.imageUrl || ''
+          });
+        });
+        
+        setProductsMap(grouped);
+      } catch (err) {
+        console.error("Error fetching catalog", err);
+      }
+    };
+    
+    if (categories.length > 0) {
+      fetchCatalog();
+    }
+  }, [selectedBuyer, categories]);
+
+  const currentProducts = productsMap[selectedCategory] || [];
+  const flashProducts = productsMap[flashCategory] || [];
+
+  // Save cart and buyer to session storage
   useEffect(() => {
     sessionStorage.setItem('orderCart', JSON.stringify(cart));
   }, [cart]);
+
+  useEffect(() => {
+    if (selectedBuyer) {
+      sessionStorage.setItem('selectedBuyer', JSON.stringify(selectedBuyer));
+    }
+  }, [selectedBuyer]);
 
   // Cart functions
   const addToCart = (product, quantity) => {
@@ -363,14 +351,14 @@ function CreateOrder() {
             }}>
               {categories.map((cat) => (
                 <button
-                  key={cat}
-                  onClick={() => setFlashCategory(cat)}
+                  key={cat.id || cat.name || cat}
+                  onClick={() => setFlashCategory(cat.name || cat)}
                   style={{
                     padding: '6px 14px',
                     borderRadius: '20px',
                     border: 'none',
-                    background: flashCategory === cat ? '#8B6914' : '#f0e6d8',
-                    color: flashCategory === cat ? 'white' : '#5C4033',
+                    background: flashCategory === (cat.name || cat) ? '#8B6914' : '#f0e6d8',
+                    color: flashCategory === (cat.name || cat) ? 'white' : '#5C4033',
                     fontFamily: "'Inter', sans-serif",
                     fontSize: '12px',
                     fontWeight: 500,
@@ -378,7 +366,7 @@ function CreateOrder() {
                     transition: 'all 0.2s ease'
                   }}
                 >
-                  {cat}
+                  {cat.name || cat}
                 </button>
               ))}
             </div>
@@ -583,8 +571,8 @@ function CreateOrder() {
             
             {categories.map((cat) => (
               <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
+                key={cat.id || cat.name || cat}
+                onClick={() => setSelectedCategory(cat.name || cat)}
                 style={{
                   width: '100%',
                   display: 'flex',
@@ -593,17 +581,17 @@ function CreateOrder() {
                   padding: '10px 16px',
                   border: 'none',
                   borderRadius: '8px',
-                  background: selectedCategory === cat ? '#e5eeff' : 'transparent',
-                  color: selectedCategory === cat ? '#8B6914' : '#5C4033',
+                  background: selectedCategory === (cat.name || cat) ? '#e5eeff' : 'transparent',
+                  color: selectedCategory === (cat.name || cat) ? '#8B6914' : '#5C4033',
                   cursor: 'pointer',
                   fontFamily: "'Inter', sans-serif",
                   fontSize: '14px',
-                  fontWeight: selectedCategory === cat ? 600 : 400,
+                  fontWeight: selectedCategory === (cat.name || cat) ? 600 : 400,
                   transition: 'all 0.2s ease',
                   marginBottom: '4px'
                 }}
               >
-                {cat}
+                {cat.name || cat}
               </button>
             ))}
           </div>

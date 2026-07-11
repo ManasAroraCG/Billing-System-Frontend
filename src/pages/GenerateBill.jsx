@@ -1,50 +1,75 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
+import { getInvoiceById } from '../api';
+
 function GenerateBill() {
-  const [cart] = useState(() => {
-    const saved = sessionStorage.getItem('orderCart');
-    return saved ? JSON.parse(saved) : {};
-  });
-  const [billNo] = useState('INV-' + Date.now().toString().slice(-6));
-  const [billDate] = useState(new Date().toLocaleDateString('en-IN', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric'
-  }));
-  const [dueDate] = useState(new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric'
-  }));
+  const [invoice, setInvoice] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchInvoice = async () => {
+      try {
+        const id = sessionStorage.getItem('generatedBillId');
+        if (!id) {
+          console.error('No invoice found');
+          setLoading(false);
+          return;
+        }
+        const data = await getInvoiceById(id);
+        setInvoice(data);
+      } catch (err) {
+        console.error('Failed to fetch invoice', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchInvoice();
+  }, []);
   const [digitalSignature, setDigitalSignature] = useState(null);
   const billRef = useRef(null);
   const canvasRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [showSignaturePad, setShowSignaturePad] = useState(false);
 
-  const cartItems = Object.values(cart);
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.quantity * parseFloat(item.price)), 0);
-  const gst = subtotal * 0.05;
-  const grandTotal = subtotal + gst;
+  if (loading) {
+    return <div style={{ padding: '80px', textAlign: 'center', fontFamily: 'Inter' }}>Loading Invoice...</div>;
+  }
+
+  if (!invoice) {
+    return <div style={{ padding: '80px', textAlign: 'center', fontFamily: 'Inter' }}>No invoice data found. Please create an order first.</div>;
+  }
+
+  const billNo = invoice.invoiceNumber;
+  const billDate = new Date(invoice.invoiceDate).toLocaleDateString('en-IN', {
+    day: '2-digit', month: 'short', year: 'numeric'
+  });
+  const dueDate = invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString('en-IN', {
+    day: '2-digit', month: 'short', year: 'numeric'
+  }) : '-';
+
+  const cartItems = invoice.items || [];
+  const subtotal = invoice.subTotal || 0;
+  const gst = invoice.totalGst || 0;
+  const grandTotal = invoice.grandTotal || 0;
 
   const companyInfo = {
-    name: 'AQUA SANITARY SOLUTIONS',
-    address: '123, Industrial Area, Sector 12',
-    city: 'New Delhi - 110001, India',
-    phone: '+91 98765 43210',
-    email: 'info@aquasanitary.com',
-    gstin: '07AABCU9603R1Z8',
-    pan: 'AABCU9603R'
+    name: invoice.companySnapshot?.companyName || 'Company Name',
+    address: invoice.companySnapshot?.address || '',
+    city: '',
+    phone: invoice.companySnapshot?.phone || '',
+    email: invoice.companySnapshot?.email || '',
+    gstin: invoice.companySnapshot?.gstin || '',
+    pan: ''
   };
 
   const buyerInfo = {
-    name: 'Ramesh Constructions',
-    address: '456, Business Park, Andheri East',
-    city: 'Mumbai - 400093, India',
-    gstin: '27AABCU9603R1Z7'
+    name: invoice.customerSnapshot?.partyName || 'Customer',
+    address: invoice.customerSnapshot?.billingAddress || '',
+    city: '',
+    gstin: invoice.customerSnapshot?.gstin || ''
   };
 
   const numberToWords = (num) => {
@@ -777,7 +802,7 @@ function GenerateBill() {
                       padding: '8px',
                       fontSize: '11px'
                     }}>
-                      <div style={{ fontWeight: '500' }}>{item.name}</div>
+                      <div style={{ fontWeight: '500' }}>{item.productName}</div>
                       <div style={{ fontSize: '9px', color: '#666', marginTop: '2px' }}>Model: #{item.model}</div>
                     </td>
                     <td style={{
@@ -802,7 +827,7 @@ function GenerateBill() {
                       textAlign: 'right',
                       fontSize: '11px'
                     }}>
-                      {parseFloat(item.price).toFixed(2)}
+                      {parseFloat(item.rate).toFixed(2)}
                     </td>
                     <td style={{
                       border: '1px solid #000',
@@ -811,7 +836,7 @@ function GenerateBill() {
                       fontSize: '11px',
                       fontWeight: '500'
                     }}>
-                      {(item.quantity * parseFloat(item.price)).toFixed(2)}
+                      {(item.quantity * parseFloat(item.rate)).toFixed(2)}
                     </td>
                   </tr>
                 ))}
@@ -852,7 +877,7 @@ function GenerateBill() {
                 paddingTop: '8px',
                 lineHeight: '1.4'
               }}>
-                {numberToWords(grandTotal)}
+                {invoice.totalInWords}
               </p>
               <p style={{
                 fontSize: '9px',
